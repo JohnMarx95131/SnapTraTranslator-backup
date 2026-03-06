@@ -1,6 +1,6 @@
 # SnapTra Translator
 
-[English](README.md)
+[English](README.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
 一款轻量级 macOS 菜单栏应用，通过屏幕取词和 OCR 即时翻译光标下的单词。按下快捷键悬停到任意文本上，即可看到精美的悬浮气泡，显示翻译、音标、词典释义，并可选择播放发音。
 
