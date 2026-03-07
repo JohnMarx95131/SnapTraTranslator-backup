@@ -5,6 +5,26 @@ final class DictionaryService {
     /// Offline ECDICT database. Exposed so AppModel can pass it to DictionaryDownloadManager.
     let offlineService = OfflineDictionaryService()
 
+    /// Performs a lookup using the provided dictionary sources in priority order.
+    /// - Parameters:
+    ///   - word: The word to look up
+    ///   - sources: Array of dictionary sources to query (in priority order)
+    ///   - preferEnglish: Whether to prefer English definitions
+    /// - Returns: The first matching dictionary entry, or nil if not found
+    func lookup(_ word: String, sources: [DictionarySource], preferEnglish: Bool = false) -> DictionaryEntry? {
+        guard let normalized = normalizeWord(word) else { return nil }
+
+        // Query each enabled source in order
+        for source in sources where source.isEnabled {
+            if let entry = lookupFromSource(source, word: normalized, preferEnglish: preferEnglish) {
+                return entry
+            }
+        }
+
+        return nil
+    }
+
+    /// Legacy lookup method for backward compatibility - tries ECDICT first, then system.
     func lookup(_ word: String, preferEnglish: Bool = false) -> DictionaryEntry? {
         guard let normalized = normalizeWord(word) else { return nil }
 
@@ -14,22 +34,43 @@ final class DictionaryService {
         }
 
         // Fall back to macOS system dictionary
-        let range = CFRange(location: 0, length: normalized.utf16.count)
-        guard let definition = DCSCopyTextDefinition(nil, normalized as CFString, range) else {
+        return lookupFromSystemDictionary(word: normalized, preferEnglish: preferEnglish)
+    }
+
+    // MARK: - Private
+
+    private func lookupFromSource(_ source: DictionarySource, word: String, preferEnglish: Bool) -> DictionaryEntry? {
+        switch source.type {
+        case .ecdict:
+            guard let entry = offlineService.lookup(word) else { return nil }
+            // Return entry with source information
+            return DictionaryEntry(
+                word: entry.word,
+                phonetic: entry.phonetic,
+                definitions: entry.definitions,
+                source: .advancedDictionary
+            )
+        case .system:
+            return lookupFromSystemDictionary(word: word, preferEnglish: preferEnglish)
+        }
+    }
+
+    private func lookupFromSystemDictionary(word: String, preferEnglish: Bool) -> DictionaryEntry? {
+        let range = CFRange(location: 0, length: word.utf16.count)
+        guard let definition = DCSCopyTextDefinition(nil, word as CFString, range) else {
             return nil
         }
 
         let html = definition.takeRetainedValue() as String
 
         #if DEBUG
-        print("[DictionaryService] System dictionary result for '\(normalized)' (\(html.count) chars):\n\(html.prefix(2000))")
+        print("[DictionaryService] System dictionary result for '\(word)' (\(html.count) chars):\n\(html.prefix(2000))")
         #endif
 
         if preferEnglish {
-            return parseEnglishHTML(html, word: normalized)
+            return parseEnglishHTML(html, word: word)
         }
-
-        return parseHTML(html, word: normalized)
+        return parseHTML(html, word: word)
     }
 
     // MARK: - Private

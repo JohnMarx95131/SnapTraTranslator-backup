@@ -277,7 +277,7 @@ final class AppModel: ObservableObject {
             guard !Task.isCancelled, activeLookupID == lookupID else { return }
 
             let targetIsEnglish = targetLanguage.minimalIdentifier == "en"
-            let dictEntry = dictionaryService.lookup(selected.text, preferEnglish: targetIsEnglish)
+            let dictEntry = dictionaryService.lookup(selected.text, sources: settings.dictionarySources, preferEnglish: targetIsEnglish)
             let phonetic = dictEntry?.phonetic
             var definitions = dictEntry?.definitions ?? []
             let dictionarySource = dictEntry?.source

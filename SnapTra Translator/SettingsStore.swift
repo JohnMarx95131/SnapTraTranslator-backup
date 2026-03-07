@@ -24,8 +24,14 @@ final class SettingsStore: ObservableObject {
     @Published var continuousTranslation: Bool {
         didSet { defaults.set(continuousTranslation, forKey: AppSettingKey.continuousTranslation) }
     }
+    @Published var dictionarySources: [DictionarySource] {
+        didSet {
+            saveDictionarySources()
+        }
+    }
 
     private let defaults: UserDefaults
+    private static let dictionarySourcesKey = "dictionarySources"
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -44,6 +50,46 @@ final class SettingsStore: ObservableObject {
         targetLanguage = defaults.string(forKey: AppSettingKey.targetLanguage) ?? defaultTarget
         debugShowOcrRegion = debugShowOcrRegionValue ?? false
         continuousTranslation = continuousTranslationValue ?? true
+
+        // Load or migrate dictionary sources
+        dictionarySources = Self.loadOrMigrateDictionarySources(defaults: defaults)
+    }
+
+    private static func loadOrMigrateDictionarySources(defaults: UserDefaults) -> [DictionarySource] {
+        // Try to load existing sources
+        if let data = defaults.data(forKey: dictionarySourcesKey),
+           let sources = try? JSONDecoder().decode([DictionarySource].self, from: data) {
+            return sources
+        }
+
+        // Migration: Check if ECDICT was previously installed (using old key)
+        let oldEcdictInstalledKey = "ecdictInstalled"
+        let wasEcdictInstalled = defaults.bool(forKey: oldEcdictInstalledKey)
+
+        // Create default configuration (backward compatible)
+        let sources: [DictionarySource] = [
+            DictionarySource(
+                id: UUID(),
+                name: String(localized: "Advanced Dictionary"),
+                type: .ecdict,
+                isEnabled: true
+            ),
+            DictionarySource(
+                id: UUID(),
+                name: String(localized: "System Dictionary"),
+                type: .system,
+                isEnabled: true
+            )
+        ]
+
+        // Note: We don't delete the old key in case user downgrades
+        return sources
+    }
+
+    private func saveDictionarySources() {
+        if let data = try? JSONEncoder().encode(dictionarySources) {
+            defaults.set(data, forKey: Self.dictionarySourcesKey)
+        }
     }
 
     var hotkeyDisplayText: String {

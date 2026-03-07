@@ -120,8 +120,22 @@ When disabled:
 #### Translation Service Warmup
 On macOS 15+, `warmupServices()` performs a dummy translation at launch ("hello") to initialize the Translation framework. This prevents first-translation delays but means the app briefly activates translation services on startup.
 
+#### Offline Dictionary (ECDICT)
+`OfflineDictionaryService`: SQLite-based lookup against ECDICT database (~3.4M entries).
+- Database path: `~/Library/Application Support/SnapTra Translator/Dictionaries/stardict.db`
+- Uses `SQLite3` framework (system, no external deps)
+- `DictionaryService` tries offline lookup first, falls back to system `DCSCopyTextDefinition`
+- Includes basic inflection stemming: -ing/-ed/-s/-ies variants tried in sequence
+
+`DictionaryDownloadManager`: `@MainActor ObservableObject` managing download lifecycle.
+- States: `.notInstalled` → `.downloading(progress)` → `.installing` → `.installed(sizeMB)` / `.error`
+- Downloads ECDICT zip from GitHub releases, extracts via `/usr/bin/ditto`
+- Sandboxed apps (App Store): `ditto` may fail — `selectManually()` opens `NSOpenPanel` as fallback
+- ECDICT download URL is a constant in `DictionaryDownloadManager` — update when new version releases
+- Exposed on `AppModel` as `let dictionaryDownload: DictionaryDownloadManager`
+
 #### Entitlement System (Currently Disabled)
-The entitlement system was designed but is currently not active in the codebase. The `EntitlementManager`, `StoreKitManager`, and paywall UI (`PaywallView.swift`) exist but are not integrated into the main flow. Debug builds bypass all checks.
+The entitlement system was designed but is currently not active in the codebase. `PaywallView.swift` exists but is not integrated into the main flow. `EntitlementManager` and `StoreKitManager` are referenced in comments but do not exist as source files. Debug builds bypass all checks.
 
 #### Settings Persistence
 `SettingsStore`: ObservableObject with `@AppStorage` properties
@@ -195,7 +209,7 @@ See `AGENTS.md` for comprehensive style guidelines. Key conventions:
 
 ### Common Gotchas
 
-1. **Translation hangs**: Ensure TranslationServiceWindowHolder.shared.window stays alive
+1. **Translation hangs**: Ensure `TranslationServiceWindowHolder.shared.window` stays alive. Also, `TranslationBridgeView` must initialize its configuration in `init()` (via `_configuration = State(initialValue:)`), not `onAppear` — the window is created hidden (`setIsVisible(false)`) so `onAppear` never fires and configuration would remain nil.
 2. **Language change breaks translation**: Must reset entire session (see `TranslationBridgeView.resetConfiguration()`)
 3. **OCR misses words**: Check language is set correctly in VNRecognizeTextRequest
 4. **Hotkey doesn't work**: Screen Recording permission required for event monitoring
@@ -227,7 +241,9 @@ SnapTra Translator/
 ├── TranslationService.swift         # TranslationBridge + TranslationBridgeView
 ├── OCRService.swift                 # Vision-based word recognition
 ├── ScreenCaptureService.swift       # Screen capture around cursor
-├── DictionaryService.swift          # System dictionary lookups
+├── DictionaryService.swift          # Dictionary lookups (offline-first, system fallback)
+├── OfflineDictionaryService.swift   # SQLite ECDICT offline dictionary
+├── DictionaryDownloadManager.swift  # Download/install/delete ECDICT database
 ├── DictionaryEntry.swift            # Dictionary models
 ├── PhoneticService.swift            # Phonetic notation
 ├── SpeechService.swift              # Text-to-speech

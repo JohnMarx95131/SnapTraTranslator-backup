@@ -29,7 +29,7 @@ struct Snap_TranslateApp: App {
     }
 }
 
-final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMenuDelegate {
     private let model = AppModel()
     private var cancellables = Set<AnyCancellable>()
     private var statusItem: NSStatusItem?
@@ -41,6 +41,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var settingsWindow: NSWindow? {
         settingsWindowController?.window
     }
+
+    // Store menu items that need state updates
+    private weak var pronunciationMenuItem: NSMenuItem?
+    private weak var continuousTranslationMenuItem: NSMenuItem?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -110,33 +114,171 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     private func configureStatusItem() {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+
         if let button = item.button {
             button.image = makeStatusBarImage()
             button.imagePosition = .imageOnly
-            button.target = self
-            button.action = #selector(statusItemClicked(_:))
-            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
             button.toolTip = "SnapTra Translator"
+            // Note: When using statusItem.menu, we don't need to set target/action
+            // The menu will be shown automatically when the button is clicked
         }
+
+        // Create and assign the menu
+        let menu = createStatusBarMenu()
+        item.menu = menu
+
         statusItem = item
     }
 
-    private func makeStatusMenu() -> NSMenu {
+    private func createStatusBarMenu() -> NSMenu {
         let menu = NSMenu()
+        menu.delegate = self
+
+        // Title item (disabled, gray)
+        let titleItem = NSMenuItem(
+            title: "SnapTra Translator",
+            action: nil,
+            keyEquivalent: ""
+        )
+        titleItem.isEnabled = false
+        menu.addItem(titleItem)
+        menu.addItem(.separator())
+
+        // Quick actions - store references for dynamic updates
+        // Pronunciation toggle
+        let pronunciationItem = NSMenuItem(
+            title: "",
+            action: #selector(togglePronunciation),
+            keyEquivalent: ""
+        )
+        pronunciationItem.target = self
+        menu.addItem(pronunciationItem)
+        self.pronunciationMenuItem = pronunciationItem
+
+        // Continuous translation toggle
+        let continuousItem = NSMenuItem(
+            title: "",
+            action: #selector(toggleContinuousTranslation),
+            keyEquivalent: ""
+        )
+        continuousItem.target = self
+        menu.addItem(continuousItem)
+        self.continuousTranslationMenuItem = continuousItem
+
+        // Hotkey display (disabled, just shows current hotkey)
+        let hotkeyFormat = NSLocalizedString("Shortcut: %@", comment: "Hotkey display in menu")
+        let hotkeyItem = NSMenuItem(
+            title: String(format: hotkeyFormat, model.settings.hotkeyDisplayText),
+            action: nil,
+            keyEquivalent: ""
+        )
+        hotkeyItem.isEnabled = false
+        menu.addItem(hotkeyItem)
+
+        menu.addItem(.separator())
+
+        // Settings
         let settingsItem = NSMenuItem(
-            title: String(localized: "Settings..."),
+            title: NSLocalizedString("Settings...", comment: "Settings menu item"),
             action: #selector(openSettings),
             keyEquivalent: ","
         )
         settingsItem.target = self
         menu.addItem(settingsItem)
+
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(
-            title: String(localized: "Quit SnapTra"),
+
+        // About
+        let aboutItem = NSMenuItem(
+            title: NSLocalizedString("About", comment: "About menu item"),
+            action: #selector(openAbout),
+            keyEquivalent: ""
+        )
+        aboutItem.target = self
+        menu.addItem(aboutItem)
+
+        // Quit
+        let quitItem = NSMenuItem(
+            title: NSLocalizedString("Quit SnapTra", comment: "Quit menu item"),
             action: #selector(NSApplication.terminate(_:)),
             keyEquivalent: "q"
-        ))
+        )
+        menu.addItem(quitItem)
+
+        // Update dynamic menu item titles
+        updateDynamicMenuItems()
+
         return menu
+    }
+
+    private func updateDynamicMenuItems() {
+        // Update pronunciation menu item
+        let pronunciationTitle = model.settings.playPronunciation
+            ? NSLocalizedString("Pronunciation: On", comment: "Pronunciation toggle on")
+            : NSLocalizedString("Pronunciation: Off", comment: "Pronunciation toggle off")
+        pronunciationMenuItem?.title = pronunciationTitle
+
+        // Update continuous translation menu item
+        let continuousTitle = model.settings.continuousTranslation
+            ? NSLocalizedString("Continuous Translation: On", comment: "Continuous translation toggle on")
+            : NSLocalizedString("Continuous Translation: Off", comment: "Continuous translation toggle off")
+        continuousTranslationMenuItem?.title = continuousTitle
+    }
+
+    // MARK: - NSMenuDelegate
+
+    func menuWillOpen(_ menu: NSMenu) {
+        // Update menu item states before showing
+        updateDynamicMenuItems()
+    }
+
+    // This method is kept for compatibility but no longer used
+    // When statusItem.menu is set, the system handles menu display automatically
+    @objc private func statusItemClicked(_ sender: NSStatusBarButton) {}
+
+    @objc private func togglePronunciation() {
+        model.settings.playPronunciation.toggle()
+    }
+
+    @objc private func toggleContinuousTranslation() {
+        model.settings.continuousTranslation.toggle()
+    }
+
+    @objc private func openAbout() {
+        isManualWindowOpen = true
+        NSApp.setActivationPolicy(.regular)
+        if let window = aboutWindowController?.window, window.isVisible {
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+        } else {
+            showAboutWindow()
+        }
+    }
+
+    private var aboutWindowController: NSWindowController?
+
+    private func showAboutWindow() {
+        let contentView = AboutView()
+            .environmentObject(model)
+        let hostingView = NSHostingView(rootView: contentView)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 400, height: 300)
+
+        let window = NSWindow(
+            contentRect: hostingView.frame,
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        window.contentView = hostingView
+        window.title = NSLocalizedString("About SnapTra Translator", comment: "About window title")
+        window.isReleasedWhenClosed = false
+        window.center()
+
+        let controller = NSWindowController(window: window)
+        aboutWindowController = controller
+        controller.showWindow(nil)
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     @objc func openSettings() {
@@ -165,18 +307,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
 
         return nil
-    }
-
-    @objc private func statusItemClicked(_ sender: NSStatusBarButton) {
-        guard let event = NSApp.currentEvent else { openSettings(); return }
-        if event.type == .rightMouseUp {
-            let menu = makeStatusMenu()
-            sender.menu = menu
-            sender.performClick(nil)
-            sender.menu = nil
-        } else {
-            openSettings()
-        }
     }
 
     private func checkPermissionGrantRestart() {
@@ -250,20 +380,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 @MainActor
 final class SettingsWindowController: NSWindowController {
     init(model: AppModel) {
-        let contentView = ContentView()
+        let contentView = SettingsWindowView()
             .environmentObject(model)
         let hostingView = NSHostingView(rootView: contentView)
-        hostingView.frame = NSRect(x: 0, y: 0, width: 360, height: 760)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 640, height: 480)
 
         let window = NSWindow(
             contentRect: hostingView.frame,
-            styleMask: [.titled, .closable, .miniaturizable],
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
         window.contentView = hostingView
-        window.title = "SnapTra Translator"
+        window.title = String(localized: "Settings")
         window.isReleasedWhenClosed = false
+        window.minSize = NSSize(width: 600, height: 400)
         window.center()
 
         super.init(window: window)
