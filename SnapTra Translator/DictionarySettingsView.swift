@@ -54,11 +54,11 @@ struct DictionarySettingsView: View {
                 enableECDICTSource()
             }
 
-            // WordNet Download Section
-            WordNetDownloadSection(manager: model.wordNetDownload) {
-                // Callback when download starts - enable WordNet source
-                enableWordNetSource()
-            }
+            // WordNet Download Section - Hidden until database is hosted
+            // TODO: Uncomment when WordNet database is available
+            // WordNetDownloadSection(manager: model.wordNetDownload) {
+            //     enableWordNetSource()
+            // }
 
             Spacer()
         }
