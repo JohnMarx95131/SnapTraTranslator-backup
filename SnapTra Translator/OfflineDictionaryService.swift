@@ -113,7 +113,8 @@ final class OfflineDictionaryService {
             word: foundWord,
             phonetic: phonetic,
             definitions: defs,
-            source: .advancedDictionary
+            source: .advancedDictionary,
+            synonyms: []
         )
     }
 

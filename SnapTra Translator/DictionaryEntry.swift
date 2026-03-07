@@ -3,14 +3,16 @@ import Foundation
 /// 词典条目，包含单词的完整词典信息
 struct DictionaryEntry: Equatable {
     enum Source: Equatable {
-        case advancedDictionary
-        case systemDictionary
+        case advancedDictionary  // ECDICT
+        case wordNet             // WordNet English-English
+        case systemDictionary    // macOS system dictionary
     }
 
     let word: String
     let phonetic: String?
     let definitions: [Definition]
     let source: Source
+    let synonyms: [String]  // 同义词列表
 
     /// 单个词义定义
     struct Definition: Equatable {
@@ -33,5 +35,10 @@ struct DictionaryEntry: Equatable {
     /// 获取第一个音标
     var primaryPhonetic: String? {
         phonetic
+    }
+
+    /// 是否有同义词
+    var hasSynonyms: Bool {
+        !synonyms.isEmpty
     }
 }

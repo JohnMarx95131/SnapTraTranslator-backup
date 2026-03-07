@@ -48,7 +48,8 @@ final class DictionaryService {
                 word: entry.word,
                 phonetic: entry.phonetic,
                 definitions: entry.definitions,
-                source: .advancedDictionary
+                source: .advancedDictionary,
+                synonyms: entry.synonyms
             )
         case .system:
             return lookupFromSystemDictionary(word: word, preferEnglish: preferEnglish)
@@ -94,7 +95,8 @@ final class DictionaryService {
             word: word,
             phonetic: phonetic,
             definitions: definitions,
-            source: .systemDictionary
+            source: .systemDictionary,
+            synonyms: []
         )
     }
     
@@ -106,7 +108,8 @@ final class DictionaryService {
             word: word,
             phonetic: phonetic,
             definitions: definitions,
-            source: .systemDictionary
+            source: .systemDictionary,
+            synonyms: []
         )
     }
     
