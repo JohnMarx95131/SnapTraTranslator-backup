@@ -50,17 +50,17 @@ enum TTSProvider: String, CaseIterable, Identifiable {
     var displayName: String {
         switch self {
         case .apple:
-            return String(localized: "Apple System Voice")
+            return String(localized: "Apple")
         case .youdao:
-            return String(localized: "Youdao Dictionary")
+            return String(localized: "Youdao")
         case .bing:
-            return String(localized: "Bing Translate")
+            return String(localized: "Bing")
         case .edge:
-            return String(localized: "Edge (Microsoft)")
+            return String(localized: "Edge")
         case .google:
-            return String(localized: "Google Translate")
+            return String(localized: "Google")
         case .baidu:
-            return String(localized: "Baidu Translate")
+            return String(localized: "Baidu")
         }
     }
 
