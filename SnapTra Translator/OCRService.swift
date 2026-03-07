@@ -75,10 +75,10 @@ final class OCRService {
     }
 
     // 只包含英语字母，数字和其他符号都作为分隔符
-    private static let tokenCharacterSet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-    private static let letterSet = CharacterSet.letters
+    nonisolated private static let tokenCharacterSet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    nonisolated private static let letterSet = CharacterSet.letters
 
-    private static func refinedTokenRanges(in token: Substring) -> [Range<String.Index>] {
+    nonisolated private static func refinedTokenRanges(in token: Substring) -> [Range<String.Index>] {
         var ranges: [Range<String.Index>] = []
         let indices = Array(token.indices)
         var tokenStart: String.Index?
@@ -115,7 +115,7 @@ final class OCRService {
     }
 
     // 使用简单的字符比例计算边界框（最稳定的方法）
-    private static func boundingBoxByCharacterRatio(_ textBox: CGRect, text: String, for range: Range<String.Index>) -> CGRect? {
+    nonisolated private static func boundingBoxByCharacterRatio(_ textBox: CGRect, text: String, for range: Range<String.Index>) -> CGRect? {
         let totalCount = text.count
         guard totalCount > 0 else { return nil }
         guard range.lowerBound >= text.startIndex, range.upperBound <= text.endIndex else { return nil }
@@ -137,7 +137,7 @@ final class OCRService {
     }
 
     // 使用 Core Text 测量实际字符宽度来计算边界框（备用方法）
-    private static func boundingBoxBySplittingWithCoreText(_ textBox: CGRect, text: String, for range: Range<String.Index>) -> CGRect? {
+    nonisolated private static func boundingBoxBySplittingWithCoreText(_ textBox: CGRect, text: String, for range: Range<String.Index>) -> CGRect? {
         guard range.lowerBound >= text.startIndex, range.upperBound <= text.endIndex else {
             return nil
         }
@@ -181,19 +181,19 @@ final class OCRService {
     }
 
     // 检查两个边界框是否相似（用于判断 Vision 是否返回了精确的子范围边界框）
-    private static func areBoundingBoxesSimilar(_ lhs: CGRect, _ rhs: CGRect, tolerance: CGFloat = 0.02) -> Bool {
+    nonisolated private static func areBoundingBoxesSimilar(_ lhs: CGRect, _ rhs: CGRect, tolerance: CGFloat = 0.02) -> Bool {
         abs(lhs.origin.x - rhs.origin.x) <= tolerance
             && abs(lhs.origin.y - rhs.origin.y) <= tolerance
             && abs(lhs.size.width - rhs.size.width) <= tolerance
             && abs(lhs.size.height - rhs.size.height) <= tolerance
     }
 
-    private static func isTokenCharacter(_ character: Character) -> Bool {
+    nonisolated private static func isTokenCharacter(_ character: Character) -> Bool {
         character.unicodeScalars.contains { tokenCharacterSet.contains($0) }
     }
 
 
-    private static func shouldSplitCamelCase(previous: Character, current: Character, next: Character?) -> Bool {
+    nonisolated private static func shouldSplitCamelCase(previous: Character, current: Character, next: Character?) -> Bool {
         let previousIsLowercase = isLowercaseLetter(previous)
         let previousIsUppercase = isUppercaseLetter(previous)
         let currentIsUppercase = isUppercaseLetter(current)
@@ -210,15 +210,15 @@ final class OCRService {
         return false
     }
 
-    private static func isUppercaseLetter(_ character: Character) -> Bool {
+    nonisolated private static func isUppercaseLetter(_ character: Character) -> Bool {
         character.unicodeScalars.contains { CharacterSet.uppercaseLetters.contains($0) }
     }
 
-    private static func isLowercaseLetter(_ character: Character) -> Bool {
+    nonisolated private static func isLowercaseLetter(_ character: Character) -> Bool {
         character.unicodeScalars.contains { CharacterSet.lowercaseLetters.contains($0) }
     }
 
-    private static func containsLetter(in token: Substring) -> Bool {
+    nonisolated private static func containsLetter(in token: Substring) -> Bool {
         token.unicodeScalars.contains { letterSet.contains($0) }
     }
 }
