@@ -157,21 +157,28 @@ struct OverlayView: View {
                 }
             }
 
-            // Phonetic notation
-            if let phonetic = content.phonetic, !phonetic.isEmpty {
-                Text(phonetic)
-                    .font(.system(size: 11, weight: .regular, design: .monospaced))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .strokeBorder(.secondary.opacity(0.25), lineWidth: 0.5)
+            if (content.phonetic?.isEmpty == false) || content.dictionarySource != nil {
+                HStack(spacing: 8) {
+                    if let phonetic = content.phonetic, !phonetic.isEmpty {
+                        Text(phonetic)
+                            .font(.system(size: 11, weight: .regular, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
                             .background(
                                 RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                    .fill(.secondary.opacity(0.06))
+                                    .strokeBorder(.secondary.opacity(0.25), lineWidth: 0.5)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                            .fill(.secondary.opacity(0.06))
+                                    )
                             )
-                    )
+                    }
+
+                    if let source = content.dictionarySource {
+                        dictionarySourceBadge(source)
+                    }
+                }
             }
         }
         .padding(.horizontal, 18)
@@ -323,6 +330,31 @@ struct OverlayView: View {
             guard let translations = grouped[key], !translations.isEmpty else { return nil }
             return (key, translations)
         }
+    }
+
+    @ViewBuilder
+    private func dictionarySourceBadge(_ source: DictionaryEntry.Source) -> some View {
+        let isAdvanced = source == .advancedDictionary
+        let title = isAdvanced
+            ? String(localized: "Advanced Dictionary")
+            : String(localized: "System Dictionary")
+        let helpText = isAdvanced
+            ? String(localized: "Using the larger offline dictionary for fuller English definitions.")
+            : String(localized: "Fell back to Apple's built-in dictionary.")
+
+        Label(
+            title,
+            systemImage: isAdvanced ? "sparkles" : "book.closed"
+        )
+        .font(.system(size: 10, weight: .semibold))
+        .foregroundStyle(isAdvanced ? Color.green : .secondary)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            Capsule()
+                .fill(isAdvanced ? Color.green.opacity(0.12) : Color.secondary.opacity(0.08))
+        )
+        .help(helpText)
     }
 
     private func posColor(for pos: String) -> Color {

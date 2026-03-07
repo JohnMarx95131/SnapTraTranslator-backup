@@ -2,9 +2,15 @@ import Foundation
 
 /// 词典条目，包含单词的完整词典信息
 struct DictionaryEntry: Equatable {
+    enum Source: Equatable {
+        case advancedDictionary
+        case systemDictionary
+    }
+
     let word: String
     let phonetic: String?
     let definitions: [Definition]
+    let source: Source
 
     /// 单个词义定义
     struct Definition: Equatable {

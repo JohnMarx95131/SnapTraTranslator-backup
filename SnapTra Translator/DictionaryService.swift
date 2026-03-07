@@ -52,7 +52,8 @@ final class DictionaryService {
         return DictionaryEntry(
             word: word,
             phonetic: phonetic,
-            definitions: definitions
+            definitions: definitions,
+            source: .systemDictionary
         )
     }
     
@@ -63,7 +64,8 @@ final class DictionaryService {
         return DictionaryEntry(
             word: word,
             phonetic: phonetic,
-            definitions: definitions
+            definitions: definitions,
+            source: .systemDictionary
         )
     }
     

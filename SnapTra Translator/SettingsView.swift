@@ -51,7 +51,7 @@ struct SettingsView: View {
                 }
 
                 SettingsSectionCard(
-                    title: "Dictionary",
+                    title: String(localized: "Advanced Dictionary"),
                     icon: "books.vertical",
                     delay: 0.1
                 ) {
@@ -389,14 +389,35 @@ struct ECDICTDictionaryRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("ECDICT")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(.primary)
-                    Text(subtitle)
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 6) {
+                        Text("Advanced English Dictionary")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(.primary)
+                        Text("Powered by ECDICT")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(
+                                Capsule()
+                                    .fill(Color.secondary.opacity(0.08))
+                            )
+                    }
+                    Text(statusLine)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text("Used first for English word lookups. Translation still uses Apple Translation.")
                         .font(.system(size: 11))
                         .foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 6) {
+                        DictionaryBenefitPill(title: "Fuller definitions")
+                        DictionaryBenefitPill(title: "Tech terms")
+                        DictionaryBenefitPill(title: "Works offline")
+                    }
                 }
                 Spacer()
                 actionView
@@ -427,11 +448,11 @@ struct ECDICTDictionaryRow: View {
                         .fixedSize(horizontal: false, vertical: true)
                     HStack(spacing: 8) {
                         Button("Retry") { manager.retry() }
-                        .font(.system(size: 11, weight: .medium))
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
+                            .font(.system(size: 11, weight: .medium))
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
 
-                        Button("Select file…") { manager.selectManually() }
+                        Button("Choose file…") { manager.selectManually() }
                             .font(.system(size: 11, weight: .medium))
                             .buttonStyle(.bordered)
                             .controlSize(.small)
@@ -441,18 +462,21 @@ struct ECDICTDictionaryRow: View {
         }
     }
 
-    private var subtitle: String {
+    private var statusLine: String {
         switch manager.state {
         case .notInstalled:
-            return "3.4M entries · ~170 MB download"
+            return String(localized: "Get a larger offline dictionary for fuller meanings and better technical terms.")
         case .downloading:
-            return "Downloading…"
+            return String(localized: "Downloading the advanced dictionary…")
         case .installing:
-            return "Installing…"
+            return String(localized: "Installing the advanced dictionary…")
         case .installed(let sizeMB):
-            return String(format: "Installed · %.0f MB", sizeMB)
+            return String(
+                format: String(localized: "Enabled · %.0f MB stored offline"),
+                sizeMB
+            )
         case .error:
-            return "Installation failed"
+            return String(localized: "Advanced dictionary installation failed")
         }
     }
 
@@ -460,7 +484,7 @@ struct ECDICTDictionaryRow: View {
     private var actionView: some View {
         switch manager.state {
         case .notInstalled:
-            Button("Download") { manager.startDownload() }
+            Button("Install") { manager.startDownload() }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
 
@@ -479,10 +503,16 @@ struct ECDICTDictionaryRow: View {
 
         case .installed:
             HStack(spacing: 8) {
-                Image(systemName: "checkmark.circle.fill")
+                Text("Enabled")
+                    .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(.green)
-                    .font(.system(size: 14))
-                Button("Delete") { manager.delete() }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(Color.green.opacity(0.12))
+                    )
+                Button("Remove") { manager.delete() }
                     .font(.system(size: 11, weight: .medium))
                     .buttonStyle(.bordered)
                     .controlSize(.small)
@@ -491,5 +521,21 @@ struct ECDICTDictionaryRow: View {
         case .error:
             EmptyView()
         }
+    }
+}
+
+private struct DictionaryBenefitPill: View {
+    let title: LocalizedStringKey
+
+    var body: some View {
+        Text(title)
+            .font(.system(size: 10, weight: .medium))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                Capsule()
+                    .fill(Color.secondary.opacity(0.08))
+            )
     }
 }

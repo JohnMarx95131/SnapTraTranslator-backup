@@ -7,6 +7,15 @@
     "%lld%%" : {
 
     },
+    "Advanced Dictionary" : {
+
+    },
+    "Advanced dictionary installation failed" : {
+
+    },
+    "Advanced English Dictionary" : {
+
+    },
     "Arabic" : {
       "comment" : "Language name - use native name",
       "extractionState" : "stale",
@@ -252,6 +261,9 @@
         }
       }
     },
+    "Choose file…" : {
+
+    },
     "Continuous translation" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -389,13 +401,7 @@
         }
       }
     },
-    "Delete" : {
-
-    },
-    "Download" : {
-
-    },
-    "ECDICT" : {
+    "Downloading the advanced dictionary…" : {
 
     },
     "Enable Screen Recording" : {
@@ -431,6 +437,12 @@
           }
         }
       }
+    },
+    "Enabled" : {
+
+    },
+    "Enabled · %.0f MB stored offline" : {
+
     },
     "English" : {
       "comment" : "Language name - use native name",
@@ -468,6 +480,9 @@
         }
       }
     },
+    "Fell back to Apple's built-in dictionary." : {
+
+    },
     "French" : {
       "comment" : "Language name - use native name",
       "extractionState" : "stale",
@@ -504,6 +519,9 @@
         }
       }
     },
+    "Fuller definitions" : {
+
+    },
     "German" : {
       "comment" : "Language name - use native name",
       "extractionState" : "stale",
@@ -539,6 +557,9 @@
           }
         }
       }
+    },
+    "Get a larger offline dictionary for fuller meanings and better technical terms." : {
+
     },
     "Granted" : {
       "localizations" : {
@@ -608,7 +629,13 @@
         }
       }
     },
+    "Install" : {
+
+    },
     "Installing" : {
+
+    },
+    "Installing the advanced dictionary…" : {
 
     },
     "Italian" : {
@@ -1404,6 +1431,9 @@
         }
       }
     },
+    "Powered by ECDICT" : {
+
+    },
     "Quit SnapTra" : {
 
     },
@@ -1508,6 +1538,9 @@
           }
         }
       }
+    },
+    "Remove" : {
+
     },
     "Required" : {
       "localizations" : {
@@ -1787,9 +1820,6 @@
         }
       }
     },
-    "Select file…" : {
-
-    },
     "Settings..." : {
 
     },
@@ -2001,6 +2031,12 @@
           }
         }
       }
+    },
+    "System Dictionary" : {
+
+    },
+    "Tech terms" : {
+
     },
     "Thai" : {
       "comment" : "Language name - use native name",
@@ -2276,6 +2312,12 @@
         }
       }
     },
+    "Used first for English word lookups. Translation still uses Apple Translation." : {
+
+    },
+    "Using the larger offline dictionary for fuller English definitions." : {
+
+    },
     "Vietnamese" : {
       "comment" : "Language name - use native name",
       "extractionState" : "stale",
@@ -2311,6 +2353,9 @@
           }
         }
       }
+    },
+    "Works offline" : {
+
     }
   },
   "version" : "1.0"

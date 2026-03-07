@@ -109,7 +109,12 @@ final class OfflineDictionaryService {
 
         let defs = buildDefinitions(translation: translation, definition: definition)
         guard !defs.isEmpty else { return nil }
-        return DictionaryEntry(word: foundWord, phonetic: phonetic, definitions: defs)
+        return DictionaryEntry(
+            word: foundWord,
+            phonetic: phonetic,
+            definitions: defs,
+            source: .advancedDictionary
+        )
     }
 
     /// Parses ECDICT fields into a Definition array.

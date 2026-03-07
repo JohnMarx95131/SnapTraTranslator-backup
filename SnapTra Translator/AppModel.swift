@@ -10,12 +10,20 @@ struct OverlayContent: Equatable {
     var phonetic: String?
     var translation: String
     var definitions: [DictionaryEntry.Definition]
+    var dictionarySource: DictionaryEntry.Source?
 
-    init(word: String, phonetic: String?, translation: String, definitions: [DictionaryEntry.Definition] = []) {
+    init(
+        word: String,
+        phonetic: String?,
+        translation: String,
+        definitions: [DictionaryEntry.Definition] = [],
+        dictionarySource: DictionaryEntry.Source? = nil
+    ) {
         self.word = word
         self.phonetic = phonetic
         self.translation = translation
         self.definitions = definitions
+        self.dictionarySource = dictionarySource
     }
 }
 
@@ -272,6 +280,7 @@ final class AppModel: ObservableObject {
             let dictEntry = dictionaryService.lookup(selected.text, preferEnglish: targetIsEnglish)
             let phonetic = dictEntry?.phonetic
             var definitions = dictEntry?.definitions ?? []
+            let dictionarySource = dictEntry?.source
 
             if sourceLanguage.minimalIdentifier == targetLanguage.minimalIdentifier {
                 var processedDefinitions = definitions
@@ -295,7 +304,8 @@ final class AppModel: ObservableObject {
                     word: selected.text,
                     phonetic: phonetic,
                     translation: selected.text,
-                    definitions: processedDefinitions
+                    definitions: processedDefinitions,
+                    dictionarySource: dictionarySource
                 )
                 updateOverlay(state: .result(content), anchor: mouseLocation)
                 return
@@ -344,7 +354,8 @@ final class AppModel: ObservableObject {
                     word: selected.text,
                     phonetic: phonetic,
                     translation: translated,
-                    definitions: definitions
+                    definitions: definitions,
+                    dictionarySource: dictionarySource
                 )
                 updateOverlay(state: .result(content), anchor: mouseLocation)
             } else {
