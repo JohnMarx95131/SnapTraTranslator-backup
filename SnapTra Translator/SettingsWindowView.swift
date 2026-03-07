@@ -466,7 +466,7 @@ struct TTSProviderPickerRow: View {
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(String(localized: "Pronunciation"))
+                Text(String(localized: "Pronunciation Service"))
                     .font(.system(size: 13, weight: .regular))
                     .foregroundStyle(.primary)
                 Text(provider.description)
