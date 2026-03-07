@@ -53,7 +53,7 @@ struct SettingsWindowView: View {
                 selectedTab = tab
             }
         }
-        .frame(width: 370, height: 550)
+        .frame(width: 370, height: 570)
         .padding()
     }
 }
@@ -481,7 +481,6 @@ struct TTSProviderPickerRow: View {
             }
             .labelsHidden()
             .pickerStyle(.menu)
-            .frame(width: 120)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

@@ -660,9 +660,6 @@
         }
       }
     },
-    "Delete" : {
-
-    },
     "Dictionary" : {
       "localizations" : {
         "en" : {
@@ -3086,6 +3083,9 @@
           }
         }
       }
+    },
+    "Uninstall" : {
+
     },
     "Used first for English word lookups. Translation still uses Apple Translation." : {
 
