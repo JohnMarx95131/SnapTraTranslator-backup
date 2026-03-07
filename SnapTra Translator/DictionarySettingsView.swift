@@ -17,6 +17,7 @@ struct DictionarySource: Identifiable, Codable, Equatable {
     enum SourceType: String, Codable {
         case system    // macOS system dictionary
         case ecdict    // ECDICT offline dictionary
+        case wordNet   // WordNet English-English dictionary
     }
 }
 
@@ -90,9 +91,9 @@ struct DictionarySourceRow: View {
     var body: some View {
         HStack(spacing: 12) {
             // Icon based on type
-            Image(systemName: source.type == .ecdict ? "book.fill" : "text.book.closed")
+            Image(systemName: source.type == .ecdict ? "book.fill" : (source.type == .wordNet ? "character.book.closed" : "text.book.closed"))
                 .font(.system(size: 16))
-                .foregroundStyle(source.type == .ecdict ? .blue : .secondary)
+                .foregroundStyle(source.type == .ecdict ? .blue : (source.type == .wordNet ? .purple : .secondary))
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -100,7 +101,9 @@ struct DictionarySourceRow: View {
                     .font(.system(size: 13, weight: .medium))
                 Text(source.type == .ecdict
                      ? String(localized: "Advanced offline dictionary")
-                     : String(localized: "macOS built-in dictionary"))
+                     : (source.type == .wordNet
+                        ? String(localized: "English definitions and synonyms")
+                        : String(localized: "macOS built-in dictionary")))
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
             }
