@@ -383,7 +383,7 @@ final class SettingsWindowController: NSWindowController {
         let contentView = SettingsWindowView()
             .environmentObject(model)
         let hostingView = NSHostingView(rootView: contentView)
-        hostingView.frame = NSRect(x: 0, y: 0, width: 640, height: 480)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 427, height: 480)
 
         let window = NSWindow(
             contentRect: hostingView.frame,
@@ -394,7 +394,8 @@ final class SettingsWindowController: NSWindowController {
         window.contentView = hostingView
         window.title = String(localized: "Settings")
         window.isReleasedWhenClosed = false
-        window.minSize = NSSize(width: 600, height: 400)
+        window.minSize = NSSize(width: 427, height: 400)
+        window.maxSize = NSSize(width: 427, height: CGFloat.infinity)
         window.center()
 
         super.init(window: window)

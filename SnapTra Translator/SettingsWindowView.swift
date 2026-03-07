@@ -38,7 +38,7 @@ struct SettingsWindowView: View {
                 }
                 .tag(SettingsTab.about)
         }
-        .frame(minWidth: 600, minHeight: 400)
+        .frame(minWidth: 427, minHeight: 400)
         .padding()
     }
 }
