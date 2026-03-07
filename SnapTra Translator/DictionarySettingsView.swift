@@ -37,38 +37,42 @@ struct DictionarySettingsView: View {
     @State private var sources: [DictionarySource] = []
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                // Header
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(String(localized: "Dictionary Priority"))
-                        .font(.headline)
-                    Text(String(localized: "Drag to reorder lookup priority. The first enabled dictionary will be queried first."))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                // Dictionary Sources List
-                VStack(spacing: 12) {
-                    ForEach($sources) { $source in
-                        IntegratedDictionaryRow(
-                            source: $source,
-                            downloadState: downloadState(for: source.type),
-                            onToggle: { updateSources() },
-                            onDownloadComplete: { handleDownloadComplete(for: source.type) },
-                            onDelete: {
-                                performDelete(for: source.type)
-                                handleDelete(for: source.type)
-                            },
-                            onDownload: { performDownload(for: source.type) },
-                            onCancel: { performCancel(for: source.type) },
-                            onRetry: { performRetry(for: source.type) }
-                        )
-                    }
-                    .onMove(perform: moveSource)
-                }
+        VStack(alignment: .leading, spacing: 16) {
+            // Header
+            VStack(alignment: .leading, spacing: 4) {
+                Text(String(localized: "Dictionary Priority"))
+                    .font(.headline)
+                Text(String(localized: "Drag the handle to reorder lookup priority. The first enabled dictionary will be queried first."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top)
+
+            // Dictionary Sources List - Using List for proper drag support on macOS
+            List {
+                ForEach($sources) { $source in
+                    IntegratedDictionaryRow(
+                        source: $source,
+                        downloadState: downloadState(for: source.type),
+                        onToggle: { updateSources() },
+                        onDownloadComplete: { handleDownloadComplete(for: source.type) },
+                        onDelete: {
+                            performDelete(for: source.type)
+                            handleDelete(for: source.type)
+                        },
+                        onDownload: { performDownload(for: source.type) },
+                        onCancel: { performCancel(for: source.type) },
+                        onRetry: { performRetry(for: source.type) }
+                    )
+                    .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                }
+                .onMove(perform: moveSource)
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
         }
         .onAppear {
             loadSources()
@@ -196,8 +200,14 @@ struct IntegratedDictionaryRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Top: Basic info + Toggle
+            // Top: Drag handle + Icon + Name + Toggle (single row)
             HStack(spacing: 12) {
+                // Drag handle (aligned with first row)
+                Image(systemName: "line.horizontal.3")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.tertiary)
+                    .frame(width: 16)
+
                 // Icon
                 iconView
                     .frame(width: 24)
@@ -230,12 +240,14 @@ struct IntegratedDictionaryRow: View {
             if needsDownloadManagement {
                 Divider()
                     .padding(.vertical, 8)
+                    .padding(.leading, 52) // Align with content (drag handle + icon + spacing)
 
                 downloadManagementBar
+                    .padding(.leading, 52) // Align with content
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 12)
+        .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(Color(nsColor: .controlBackgroundColor))
