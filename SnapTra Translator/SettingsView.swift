@@ -9,15 +9,15 @@ struct SettingsView: View {
             VStack(spacing: 20) {
                 // MARK: - General
                 SettingsSectionCard(
-                    title: String(localized: "General"),
+                    title: L("General"),
                     icon: "gear",
                     delay: 0
                 ) {
                     VStack(spacing: 14) {
                         // App Language Selector
                         LanguageSelectorRow(
-                            title: String(localized: "App Language"),
-                            subtitle: String(localized: "Change the display language of the app"),
+                            title: L("App Language"),
+                            subtitle: L("Change the display language of the app"),
                             selection: $model.settings.appLanguage
                         )
 
@@ -25,8 +25,8 @@ struct SettingsView: View {
                             .opacity(0.5)
 
                         SettingsToggleRow(
-                            title: String(localized: "Launch at login"),
-                            subtitle: String(localized: "Start automatically when you log in"),
+                            title: L("Launch at login"),
+                            subtitle: L("Start automatically when you log in"),
                             isOn: $model.settings.launchAtLogin
                         )
                     }
@@ -34,7 +34,7 @@ struct SettingsView: View {
 
                 // MARK: - Shortcuts
                 SettingsSectionCard(
-                    title: String(localized: "Shortcuts"),
+                    title: L("Shortcuts"),
                     icon: "keyboard",
                     delay: 0.05
                 ) {
@@ -46,14 +46,14 @@ struct SettingsView: View {
 
                 // MARK: - Translation
                 SettingsSectionCard(
-                    title: String(localized: "Translation"),
+                    title: L("Translation"),
                     icon: "character.book.closed",
                     delay: 0.1
                 ) {
                     VStack(spacing: 14) {
                         SettingsToggleRow(
-                            title: String(localized: "Continuous translation"),
-                            subtitle: String(localized: "Keep translating as mouse moves"),
+                            title: L("Continuous translation"),
+                            subtitle: L("Keep translating as mouse moves"),
                             isOn: $model.settings.continuousTranslation
                         )
 
@@ -61,8 +61,8 @@ struct SettingsView: View {
                             .opacity(0.5)
 
                         SettingsToggleRow(
-                            title: String(localized: "Play pronunciation"),
-                            subtitle: String(localized: "Audio playback after translation"),
+                            title: L("Play pronunciation"),
+                            subtitle: L("Audio playback after translation"),
                             isOn: $model.settings.playPronunciation
                         )
 
@@ -71,8 +71,8 @@ struct SettingsView: View {
 
                         // TTS Provider Selector
                         TTSProviderSelectorRow(
-                            title: String(localized: "Pronunciation Service"),
-                            subtitle: String(localized: "Choose the voice service for pronunciation"),
+                            title: L("Pronunciation Service"),
+                            subtitle: L("Choose the voice service for pronunciation"),
                             selection: $model.settings.ttsProvider
                         )
                     }
@@ -80,7 +80,7 @@ struct SettingsView: View {
 
                 // MARK: - Dictionary
                 SettingsSectionCard(
-                    title: String(localized: "Dictionary"),
+                    title: L("Dictionary"),
                     icon: "books.vertical",
                     delay: 0.15
                 ) {
@@ -89,15 +89,15 @@ struct SettingsView: View {
 
                 // MARK: - Permissions
                 SettingsSectionCard(
-                    title: String(localized: "Permissions"),
+                    title: L("Permissions"),
                     icon: "lock.shield",
                     delay: 0.2
                 ) {
                     VStack(spacing: 14) {
                         PermissionRow(
-                            title: String(localized: "Screen Recording"),
+                            title: L("Screen Recording"),
                             isGranted: model.permissions.status.screenRecording,
-                            actionTitle: String(localized: "Open Settings"),
+                            actionTitle: L("Open Settings"),
                             action: { model.permissions.requestAndOpenScreenRecording() }
                         )
 
@@ -112,7 +112,7 @@ struct SettingsView: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: "arrow.clockwise")
                                         .font(.system(size: 11, weight: .medium))
-                                    Text(String(localized: "Refresh Status"))
+                                    Text(L("Refresh Status"))
                                         .font(.system(size: 12, weight: .medium))
                                 }
                             }
@@ -264,21 +264,21 @@ struct HotkeyKeycapSelector: View {
     private func tooltip(for key: SingleKey) -> String {
         switch key {
         case .leftShift:
-            return String(localized: "Left Shift")
+            return L("Left Shift")
         case .rightShift:
-            return String(localized: "Right Shift")
+            return L("Right Shift")
         case .leftControl:
-            return String(localized: "Left Control")
+            return L("Left Control")
         case .rightControl:
-            return String(localized: "Right Control")
+            return L("Right Control")
         case .leftOption:
-            return String(localized: "Left Option")
+            return L("Left Option")
         case .rightOption:
-            return String(localized: "Right Option")
+            return L("Right Option")
         case .leftCommand:
-            return String(localized: "Left Command")
+            return L("Left Command")
         case .rightCommand:
-            return String(localized: "Right Command")
+            return L("Right Command")
         case .fn:
             return "Fn"
         }
@@ -495,18 +495,18 @@ struct ECDICTDictionaryRow: View {
     private var statusLine: String {
         switch manager.state {
         case .notInstalled:
-            return String(localized: "Get a larger offline dictionary for fuller meanings and better technical terms.")
+            return L("Get a larger offline dictionary for fuller meanings and better technical terms.")
         case .downloading:
-            return String(localized: "Downloading the advanced dictionary…")
+            return L("Downloading the advanced dictionary…")
         case .installing:
-            return String(localized: "Installing the advanced dictionary…")
+            return L("Installing the advanced dictionary…")
         case .installed(let sizeMB):
             return String(
-                format: String(localized: "Enabled · %.0f MB stored offline"),
+                format: L("Enabled · %.0f MB stored offline"),
                 sizeMB
             )
         case .error:
-            return String(localized: "Advanced dictionary installation failed")
+            return L("Advanced dictionary installation failed")
         }
     }
 

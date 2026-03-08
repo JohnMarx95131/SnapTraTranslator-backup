@@ -16,21 +16,21 @@ enum SingleKey: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .leftShift:
-            return String(localized: "Left Shift")
+            return L("Left Shift")
         case .leftControl:
-            return String(localized: "Left Control")
+            return L("Left Control")
         case .leftOption:
-            return String(localized: "Left Option")
+            return L("Left Option")
         case .leftCommand:
-            return String(localized: "Left Command")
+            return L("Left Command")
         case .rightShift:
-            return String(localized: "Right Shift")
+            return L("Right Shift")
         case .rightControl:
-            return String(localized: "Right Control")
+            return L("Right Control")
         case .rightOption:
-            return String(localized: "Right Option")
+            return L("Right Option")
         case .rightCommand:
-            return String(localized: "Right Command")
+            return L("Right Command")
         case .fn:
             return "Fn"
         }
@@ -50,17 +50,17 @@ enum TTSProvider: String, CaseIterable, Identifiable {
     var displayName: String {
         switch self {
         case .apple:
-            return String(localized: "Apple")
+            return L("Apple")
         case .youdao:
-            return String(localized: "Youdao")
+            return L("Youdao")
         case .bing:
-            return String(localized: "Bing")
+            return L("Bing")
         case .edge:
-            return String(localized: "Edge")
+            return L("Edge")
         case .google:
-            return String(localized: "Google")
+            return L("Google")
         case .baidu:
-            return String(localized: "Baidu")
+            return L("Baidu")
         }
     }
 
@@ -71,17 +71,17 @@ enum TTSProvider: String, CaseIterable, Identifiable {
     var description: String {
         switch self {
         case .apple:
-            return String(localized: "System built-in, works offline")
+            return L("System built-in, works offline")
         case .youdao:
-            return String(localized: "No token required, supports UK/US accent")
+            return L("No token required, supports UK/US accent")
         case .bing:
-            return String(localized: "Best quality, requires token")
+            return L("Best quality, requires token")
         case .edge:
-            return String(localized: "Best quality, WebSocket based")
+            return L("Best quality, WebSocket based")
         case .google:
-            return String(localized: "Good quality, requires signature")
+            return L("Good quality, requires signature")
         case .baidu:
-            return String(localized: "No token required, supports UK/US accent")
+            return L("No token required, supports UK/US accent")
         }
     }
 }
@@ -108,7 +108,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     var displayName: String {
         switch self {
         case .system:
-            return String(localized: "System Language")
+            return L("System Language")
         case .english:
             return "English"
         case .chineseSimplified:

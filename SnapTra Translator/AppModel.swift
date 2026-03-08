@@ -246,7 +246,7 @@ final class AppModel: ObservableObject {
     func performLookup(lookupID: UUID) async {
         guard !Task.isCancelled, activeLookupID == lookupID else { return }
         guard permissions.status.screenRecording else {
-            updateOverlay(state: .error(String(localized: "Enable Screen Recording")), anchor: NSEvent.mouseLocation)
+            updateOverlay(state: .error(L("Enable Screen Recording")), anchor: NSEvent.mouseLocation)
             return
         }
         let mouseLocation = NSEvent.mouseLocation
@@ -260,7 +260,7 @@ final class AppModel: ObservableObject {
         guard let capture = await captureService.captureAroundCursor() else {
             debugOverlayWindowController.hide()
             if settings.debugShowOcrRegion {
-                updateOverlay(state: .error(String(localized: "Capture failed")), anchor: mouseLocation)
+                updateOverlay(state: .error(L("Capture failed")), anchor: mouseLocation)
             }
             return
         }
@@ -367,15 +367,15 @@ final class AppModel: ObservableObject {
                     
                     if !isInstalled {
                         let message = status == .supported
-                            ? String(localized: "Language pack required. Please download in System Settings > General > Language & Region > Translation.")
-                            : String(localized: "Translation not supported for this language pair.")
+                            ? L("Language pack required. Please download in System Settings > General > Language & Region > Translation.")
+                            : L("Translation not supported for this language pair.")
                         updateOverlay(state: .error(message), anchor: mouseLocation)
                         return
                     }
                 }
                 
                 guard isInstalled else {
-                    updateOverlay(state: .error(String(localized: "Language pack not installed.")), anchor: mouseLocation)
+                    updateOverlay(state: .error(L("Language pack not installed.")), anchor: mouseLocation)
                     return
                 }
 
@@ -410,14 +410,14 @@ final class AppModel: ObservableObject {
                 )
                 updateOverlay(state: .result(content), anchor: mouseLocation)
             } else {
-                updateOverlay(state: .error(String(localized: "Translation requires macOS 15")), anchor: mouseLocation)
+                updateOverlay(state: .error(L("Translation requires macOS 15")), anchor: mouseLocation)
             }
         } catch is CancellationError {
             // Task was cancelled, do nothing
         } catch TranslationError.timeout {
-            updateOverlay(state: .error(String(localized: "Translation timeout. Please try again.")), anchor: mouseLocation)
+            updateOverlay(state: .error(L("Translation timeout. Please try again.")), anchor: mouseLocation)
         } catch {
-            updateOverlay(state: .error(String(localized: "Translation failed: \(error.localizedDescription)")), anchor: mouseLocation)
+            updateOverlay(state: .error(L("Translation failed: \(error.localizedDescription)")), anchor: mouseLocation)
         }
     }
 
@@ -544,9 +544,9 @@ final class AppModel: ObservableObject {
         case .installed:
             break
         case .supported:
-            sendNotification(title: String(localized: "SnapTra Translator"), body: String(localized: "Language pack required. Please download in System Settings > General > Language & Region > Translation."))
+            sendNotification(title: L("SnapTra Translator"), body: L("Language pack required. Please download in System Settings > General > Language & Region > Translation."))
         case .unsupported:
-            sendNotification(title: String(localized: "SnapTra Translator"), body: String(localized: "Translation not supported for this language pair."))
+            sendNotification(title: L("SnapTra Translator"), body: L("Translation not supported for this language pair."))
         @unknown default:
             break
         }

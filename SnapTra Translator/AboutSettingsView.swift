@@ -41,7 +41,7 @@ struct AboutSettingsView: View {
                     AboutLinkRow(
                         icon: "globe",
                         iconColor: .blue,
-                        title: String(localized: "Website"),
+                        title: L("Website"),
                         url: URL(string: "https://snaptra.yelog.org/")!
                     )
                     Divider()
@@ -81,7 +81,7 @@ struct AboutSettingsView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "sparkle")
                             .font(.system(size: 12, weight: .medium))
-                        Text(String(localized: "Check for Updates"))
+                        Text(L("Check for Updates"))
                             .font(.system(size: 13, weight: .medium))
                     }
                 }
@@ -115,7 +115,7 @@ struct AboutView: View {
             HStack(spacing: 12) {
                 LinkButton(
                     icon: "globe",
-                    title: String(localized: "Website"),
+                    title: L("Website"),
                     url: URL(string: "https://snaptra.yelog.org/")!
                 )
                 LinkButton(
@@ -155,7 +155,7 @@ struct AppIdentityHeader: View {
                 .font(.system(size: 12, weight: .regular, design: .monospaced))
                 .foregroundStyle(.secondary)
 
-            Text(String(localized: "Move your cursor over a word and press the shortcut to translate"))
+            Text(L("Move your cursor over a word and press the shortcut to translate"))
                 .font(.system(size: 12))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.tertiary)
@@ -176,12 +176,12 @@ struct GitHubStarCard: View {
                     Image(systemName: "star.fill")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.yellow)
-                    Text(String(localized: "Star on GitHub"))
+                    Text(L("Star on GitHub"))
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.primary)
                 }
 
-                Text(String(localized: "If SnapTra helps you, a ⭐ on GitHub means a lot!"))
+                Text(L("If SnapTra helps you, a ⭐ on GitHub means a lot!"))
                     .font(.system(size: 11))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)

@@ -400,7 +400,7 @@ final class SettingsWindowController: NSWindowController {
             defer: false
         )
         window.contentView = hostingView
-        window.title = String(localized: "Settings")
+        window.title = L("Settings")
         window.isReleasedWhenClosed = false
         window.center()
 

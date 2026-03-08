@@ -12,6 +12,7 @@
     },
     "About" : {
       "comment" : "About menu item",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -119,13 +120,11 @@
     "Advanced Dictionary" : {
       "comment" : "ECDICT name"
     },
-    "Advanced dictionary installation failed" : {
-
-    },
     "Advanced English Dictionary" : {
 
     },
     "Advanced offline dictionary" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -158,12 +157,6 @@
           }
         }
       }
-    },
-    "App Language" : {
-
-    },
-    "Apple" : {
-
     },
     "Arabic" : {
       "comment" : "Language name - use native name",
@@ -202,6 +195,7 @@
       }
     },
     "Audio playback after translation" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -234,9 +228,6 @@
           }
         }
       }
-    },
-    "Baidu" : {
-
     },
     "Behavior" : {
       "extractionState" : "stale",
@@ -273,15 +264,6 @@
         }
       }
     },
-    "Best quality, requires token" : {
-
-    },
-    "Best quality, WebSocket based" : {
-
-    },
-    "Bing" : {
-
-    },
     "Cancel" : {
       "localizations" : {
         "en" : {
@@ -317,6 +299,7 @@
       }
     },
     "Capture failed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -350,10 +333,8 @@
         }
       }
     },
-    "Change the display language of the app" : {
-
-    },
     "Check for Updates" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -462,10 +443,8 @@
     "Choose file…" : {
 
     },
-    "Choose the voice service for pronunciation" : {
-
-    },
     "Continuous translation" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -500,6 +479,7 @@
       }
     },
     "Continuous Translation" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -638,6 +618,7 @@
       }
     },
     "Debug OCR Region" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -672,6 +653,7 @@
       }
     },
     "Dictionary" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -706,6 +688,7 @@
       }
     },
     "Dictionary Priority" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -740,6 +723,7 @@
       }
     },
     "Download" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -772,12 +756,6 @@
           }
         }
       }
-    },
-    "Downloading the advanced dictionary…" : {
-
-    },
-    "Drag the handle to reorder lookup priority. The first enabled dictionary will be queried first." : {
-
     },
     "Drag to reorder lookup priority. The first enabled dictionary will be queried first." : {
       "extractionState" : "stale",
@@ -849,10 +827,8 @@
         }
       }
     },
-    "Edge" : {
-
-    },
     "Enable Screen Recording" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -887,9 +863,6 @@
       }
     },
     "Enabled" : {
-
-    },
-    "Enabled · %.0f MB stored offline" : {
 
     },
     "English" : {
@@ -927,9 +900,6 @@
           }
         }
       }
-    },
-    "English definitions and synonyms" : {
-
     },
     "French" : {
       "comment" : "Language name - use native name",
@@ -971,6 +941,7 @@
 
     },
     "General" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1039,15 +1010,6 @@
           }
         }
       }
-    },
-    "Get a larger offline dictionary for fuller meanings and better technical terms." : {
-
-    },
-    "Good quality, requires signature" : {
-
-    },
-    "Google" : {
-
     },
     "Granted" : {
       "localizations" : {
@@ -1118,6 +1080,7 @@
       }
     },
     "If SnapTra helps you, a ⭐ on GitHub means a lot!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1154,16 +1117,11 @@
     "Install" : {
 
     },
-    "Installation failed" : {
-
-    },
     "Installing" : {
 
     },
-    "Installing the advanced dictionary…" : {
-
-    },
     "Installing..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1270,6 +1228,7 @@
       }
     },
     "Keep translating as mouse moves" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1340,6 +1299,7 @@
       }
     },
     "Language pack installed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1374,6 +1334,7 @@
       }
     },
     "Language pack not installed." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1408,6 +1369,7 @@
       }
     },
     "Language Pack Required" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1442,6 +1404,7 @@
       }
     },
     "Language pack required - click to download" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1476,6 +1439,7 @@
       }
     },
     "Language pack required. Please download in System Settings > General > Language & Region > Translation." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1510,6 +1474,7 @@
       }
     },
     "Launch at login" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1544,6 +1509,7 @@
       }
     },
     "Launch at Login" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1578,6 +1544,7 @@
       }
     },
     "Left Command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1612,6 +1579,7 @@
       }
     },
     "Left Control" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1646,6 +1614,7 @@
       }
     },
     "Left Option" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1680,6 +1649,7 @@
       }
     },
     "Left Shift" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1714,6 +1684,7 @@
       }
     },
     "macOS built-in dictionary" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1783,6 +1754,7 @@
       }
     },
     "Move your cursor over a word and press the shortcut to translate" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1815,9 +1787,6 @@
           }
         }
       }
-    },
-    "No token required, supports UK/US accent" : {
-
     },
     "No word detected" : {
       "localizations" : {
@@ -1887,10 +1856,8 @@
         }
       }
     },
-    "Not installed" : {
-
-    },
     "Open Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1925,6 +1892,7 @@
       }
     },
     "Permissions" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1959,6 +1927,7 @@
       }
     },
     "Play pronunciation" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1993,6 +1962,7 @@
       }
     },
     "Play Pronunciation" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2063,9 +2033,6 @@
       }
     },
     "Powered by ECDICT" : {
-
-    },
-    "Pronunciation Service" : {
 
     },
     "Pronunciation: Off" : {
@@ -2178,6 +2145,7 @@
       }
     },
     "Ready to translate" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2212,6 +2180,7 @@
       }
     },
     "Refresh" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2246,6 +2215,7 @@
       }
     },
     "Refresh Status" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2283,6 +2253,7 @@
 
     },
     "Required" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2320,6 +2291,7 @@
 
     },
     "Right Command" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2354,6 +2326,7 @@
       }
     },
     "Right Control" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2388,6 +2361,7 @@
       }
     },
     "Right Option" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2422,6 +2396,7 @@
       }
     },
     "Right Shift" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2492,6 +2467,7 @@
       }
     },
     "Same language - no translation needed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2526,6 +2502,7 @@
       }
     },
     "Screen Recording" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2560,6 +2537,7 @@
       }
     },
     "Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2632,6 +2610,7 @@
       }
     },
     "Shortcuts" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2666,6 +2645,7 @@
       }
     },
     "Show capture area when shortcut is pressed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2806,6 +2786,7 @@
       }
     },
     "Star on GitHub" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2840,6 +2821,7 @@
       }
     },
     "Start automatically when you log in" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2876,14 +2858,8 @@
     "System" : {
       "comment" : "System TTS provider"
     },
-    "System built-in, works offline" : {
-
-    },
     "System Dictionary" : {
       "comment" : "System dictionary name"
-    },
-    "System Language" : {
-
     },
     "Tech terms" : {
 
@@ -2925,6 +2901,7 @@
       }
     },
     "The language pack for %@ → %@ translation is not installed. Please download the required language packs in System Settings > General > Language & Region > Translation Languages." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2959,6 +2936,7 @@
       }
     },
     "Translate to" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3026,10 +3004,8 @@
         }
       }
     },
-    "Translation" : {
-
-    },
     "Translation failed: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3064,6 +3040,7 @@
       }
     },
     "Translation not supported for this language pair." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3098,6 +3075,7 @@
       }
     },
     "Translation requires macOS 15" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3132,6 +3110,7 @@
       }
     },
     "Translation timeout. Please try again." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3164,9 +3143,6 @@
           }
         }
       }
-    },
-    "Uninstall" : {
-
     },
     "Used first for English word lookups. Translation still uses Apple Translation." : {
 
@@ -3208,6 +3184,7 @@
       }
     },
     "Website" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3241,13 +3218,7 @@
         }
       }
     },
-    "WordNet" : {
-
-    },
     "Works offline" : {
-
-    },
-    "Youdao" : {
 
     }
   },

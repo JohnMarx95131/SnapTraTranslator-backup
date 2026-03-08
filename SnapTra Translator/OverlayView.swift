@@ -159,19 +159,19 @@ struct OverlayView: View {
         switch source {
         case .advancedDictionary:
             return (
-                String(localized: "Advanced Dictionary"),
+                L("Advanced Dictionary"),
                 "book.closed",
                 .secondary
             )
         case .wordNet:
             return (
-                String(localized: "WordNet"),
+                L("WordNet"),
                 "book.pages",
                 Color(red: 0.4, green: 0.6, blue: 0.9)
             )
         case .systemDictionary:
             return (
-                String(localized: "System Dictionary"),
+                L("System Dictionary"),
                 "book.closed",
                 .secondary
             )

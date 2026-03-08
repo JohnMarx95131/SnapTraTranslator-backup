@@ -40,9 +40,9 @@ struct DictionarySettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Header
             VStack(alignment: .leading, spacing: 4) {
-                Text(String(localized: "Dictionary Priority"))
+                Text(L("Dictionary Priority"))
                     .font(.headline)
-                Text(String(localized: "Drag the handle to reorder lookup priority. The first enabled dictionary will be queried first."))
+                Text(L("Drag the handle to reorder lookup priority. The first enabled dictionary will be queried first."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -304,7 +304,7 @@ struct IntegratedDictionaryRow: View {
         if let state = downloadState {
             switch state {
             case .notInstalled:
-                Label(String(localized: "Not installed"), systemImage: "icloud.and.arrow.down")
+                Label(L("Not installed"), systemImage: "icloud.and.arrow.down")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
 
@@ -323,7 +323,7 @@ struct IntegratedDictionaryRow: View {
                     ProgressView()
                         .controlSize(.small)
                         .scaleEffect(0.7)
-                    Text(String(localized: "Installing..."))
+                    Text(L("Installing..."))
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
                 }
@@ -335,7 +335,7 @@ struct IntegratedDictionaryRow: View {
 
             case .error(let message):
                 VStack(alignment: .leading, spacing: 4) {
-                    Label(String(localized: "Installation failed"), systemImage: "exclamationmark.triangle.fill")
+                    Label(L("Installation failed"), systemImage: "exclamationmark.triangle.fill")
                         .font(.system(size: 11))
                         .foregroundStyle(.red)
                     Text(message)
@@ -352,14 +352,14 @@ struct IntegratedDictionaryRow: View {
         if let state = downloadState {
             switch state {
             case .notInstalled:
-                Button(String(localized: "Download")) {
+                Button(L("Download")) {
                     onDownload()
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
 
             case .downloading:
-                Button(String(localized: "Cancel")) {
+                Button(L("Cancel")) {
                     onCancel()
                 }
                 .buttonStyle(.bordered)
@@ -369,7 +369,7 @@ struct IntegratedDictionaryRow: View {
                 EmptyView()
 
             case .installed:
-                Button(String(localized: "Uninstall")) {
+                Button(L("Uninstall")) {
                     onDelete()
                 }
                 .buttonStyle(.bordered)
@@ -378,7 +378,7 @@ struct IntegratedDictionaryRow: View {
 
             case .error:
                 HStack(spacing: 8) {
-                    Button(String(localized: "Retry")) {
+                    Button(L("Retry")) {
                         onRetry()
                     }
                     .buttonStyle(.borderedProminent)
@@ -403,11 +403,11 @@ struct IntegratedDictionaryRow: View {
     private var subtitleText: String {
         switch source.type {
         case .ecdict:
-            return String(localized: "Advanced offline dictionary")
+            return L("Advanced offline dictionary")
         case .wordNet:
-            return String(localized: "English definitions and synonyms")
+            return L("English definitions and synonyms")
         case .system:
-            return String(localized: "macOS built-in dictionary")
+            return L("macOS built-in dictionary")
         }
     }
 }

@@ -21,6 +21,7 @@ extension Notification.Name {
 struct SettingsWindowView: View {
     @EnvironmentObject var model: AppModel
     @State private var selectedTab: SettingsTab
+    @State private var languageRefreshToken = UUID()
     var initialTab: SettingsTab = .general
 
     init(initialTab: SettingsTab = .general) {
@@ -32,19 +33,19 @@ struct SettingsWindowView: View {
         TabView(selection: $selectedTab) {
             GeneralSettingsView()
                 .tabItem {
-                    Label(String(localized: "General"), systemImage: "gear")
+                    Label(L("General"), systemImage: "gear")
                 }
                 .tag(SettingsTab.general)
 
             DictionarySettingsView()
                 .tabItem {
-                    Label(String(localized: "Dictionary"), systemImage: "books.vertical")
+                    Label(L("Dictionary"), systemImage: "books.vertical")
                 }
                 .tag(SettingsTab.dictionary)
 
             AboutSettingsView()
                 .tabItem {
-                    Label(String(localized: "About"), systemImage: "info.circle")
+                    Label(L("About"), systemImage: "info.circle")
                 }
                 .tag(SettingsTab.about)
         }
@@ -53,7 +54,12 @@ struct SettingsWindowView: View {
                 selectedTab = tab
             }
         }
-        .frame(width: 370, height: 570)
+        .onReceive(NotificationCenter.default.publisher(for: .languageChanged)) { _ in
+            // Force refresh when language changes
+            languageRefreshToken = UUID()
+        }
+        .id(languageRefreshToken)
+        .frame(width: 370, height: 620)
         .padding()
     }
 }
@@ -62,6 +68,7 @@ struct SettingsWindowView: View {
 
 struct GeneralSettingsView: View {
     @EnvironmentObject var model: AppModel
+    @StateObject private var localizationManager = LocalizationManager.shared
     @State private var appeared = false
 
     private var allPermissionsGranted: Bool {
@@ -93,7 +100,7 @@ struct GeneralSettingsView: View {
                 VStack(spacing: 0) {
                     GeneralPermissionRow(
                         icon: "rectangle.dashed.badge.record",
-                        title: String(localized: "Screen Recording"),
+                        title: L("Screen Recording"),
                         isGranted: model.permissions.status.screenRecording,
                         action: { model.permissions.requestAndOpenScreenRecording() }
                     )
@@ -141,8 +148,8 @@ struct GeneralSettingsView: View {
                     }
 
                     ToggleRow(
-                        title: String(localized: "Play Pronunciation"),
-                        subtitle: String(localized: "Audio playback after translation"),
+                        title: L("Play Pronunciation"),
+                        subtitle: L("Audio playback after translation"),
                         isOn: $model.settings.playPronunciation
                     )
 
@@ -161,8 +168,8 @@ struct GeneralSettingsView: View {
                         .opacity(0.5)
 
                     ToggleRow(
-                        title: String(localized: "Continuous Translation"),
-                        subtitle: String(localized: "Keep translating as mouse moves"),
+                        title: L("Continuous Translation"),
+                        subtitle: L("Keep translating as mouse moves"),
                         isOn: $model.settings.continuousTranslation
                     )
 
@@ -171,8 +178,8 @@ struct GeneralSettingsView: View {
                         .opacity(0.5)
 
                     ToggleRow(
-                        title: String(localized: "Launch at Login"),
-                        subtitle: String(localized: "Start automatically when you log in"),
+                        title: L("Launch at Login"),
+                        subtitle: L("Start automatically when you log in"),
                         isOn: $model.settings.launchAtLogin
                     )
 
@@ -181,8 +188,8 @@ struct GeneralSettingsView: View {
                         .opacity(0.5)
 
                     ToggleRow(
-                        title: String(localized: "Debug OCR Region"),
-                        subtitle: String(localized: "Show capture area when shortcut is pressed"),
+                        title: L("Debug OCR Region"),
+                        subtitle: L("Show capture area when shortcut is pressed"),
                         isOn: $model.settings.debugShowOcrRegion
                     )
                 }
@@ -204,7 +211,7 @@ struct GeneralSettingsView: View {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundStyle(.green)
-                            Text(String(localized: "Ready to translate"))
+                            Text(L("Ready to translate"))
                                 .font(.system(size: 11, weight: .medium))
                                 .foregroundStyle(.secondary)
                         }
@@ -227,7 +234,7 @@ struct GeneralSettingsView: View {
                         HStack(spacing: 5) {
                             Image(systemName: "arrow.clockwise")
                                 .font(.system(size: 10, weight: .semibold))
-                            Text(String(localized: "Refresh"))
+                            Text(L("Refresh"))
                                 .font(.system(size: 11, weight: .medium))
                         }
                     }
@@ -279,7 +286,7 @@ struct GeneralPermissionRow: View {
                         .frame(width: 6, height: 6)
                         .shadow(color: isGranted ? .green.opacity(0.5) : .orange.opacity(0.5), radius: 3)
 
-                    Text(isGranted ? String(localized: "Granted") : String(localized: "Required"))
+                    Text(isGranted ? L("Granted") : L("Required"))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(isGranted ? .green : .orange)
                 }
@@ -352,7 +359,7 @@ struct GeneralTranslationLanguageRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Text(String(localized: "Translate to"))
+            Text(L("Translate to"))
                 .font(.system(size: 13, weight: .regular))
                 .foregroundStyle(.primary)
 
@@ -382,11 +389,11 @@ struct GeneralTranslationLanguageRow: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .alert(String(localized: "Language Pack Required"), isPresented: $showingUnavailableAlert) {
-            Button(String(localized: "Open Settings")) {
+        .alert(L("Language Pack Required"), isPresented: $showingUnavailableAlert) {
+            Button(L("Open Settings")) {
                 model.languagePackManager?.openTranslationSettings()
             }
-            Button(String(localized: "Cancel"), role: .cancel) { }
+            Button(L("Cancel"), role: .cancel) { }
         } message: {
             Text(missingLanguagesMessage)
         }
@@ -419,7 +426,7 @@ struct GeneralTranslationLanguageRow: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(.green)
-                .help(String(localized: "Same language - no translation needed"))
+                .help(L("Same language - no translation needed"))
         } else if let status = status {
             Button {
                 Task { @MainActor in
@@ -438,8 +445,8 @@ struct GeneralTranslationLanguageRow: View {
             }
             .buttonStyle(.plain)
             .help(status == .installed
-                  ? String(localized: "Language pack installed")
-                  : String(localized: "Language pack required - click to download"))
+                  ? L("Language pack installed")
+                  : L("Language pack required - click to download"))
         }
     }
 
@@ -452,7 +459,7 @@ struct GeneralTranslationLanguageRow: View {
         guard let key = commonLanguages.first(where: { $0.id == id })?.nameKey else {
             return id
         }
-        return String(localized: String.LocalizationValue(key))
+        return L(key)
     }
 
     private func checkLanguageAvailability(_ language: String) {
@@ -461,7 +468,7 @@ struct GeneralTranslationLanguageRow: View {
         if status != .installed {
             let sourceName = languageName(for: sourceLanguage)
             let targetName = languageName(for: language)
-            missingLanguagesMessage = String(localized: "The language pack for \(sourceName) → \(targetName) translation is not installed. Please download the required language packs in System Settings > General > Language & Region > Translation Languages.")
+            missingLanguagesMessage = L("The language pack for \(sourceName) → \(targetName) translation is not installed. Please download the required language packs in System Settings > General > Language & Region > Translation Languages.")
             showingUnavailableAlert = true
         }
     }
@@ -475,7 +482,7 @@ struct TTSProviderPickerRow: View {
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(String(localized: "Pronunciation Service"))
+                Text(L("Pronunciation Service"))
                     .font(.system(size: 13, weight: .regular))
                     .foregroundStyle(.primary)
                 Text(provider.description)
@@ -504,10 +511,10 @@ struct AppLanguagePickerRow: View {
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(String(localized: "App Language"))
+                Text(L("App Language"))
                     .font(.system(size: 13, weight: .regular))
                     .foregroundStyle(.primary)
-                Text(String(localized: "Change the display language of the app"))
+                Text(L("Change the display language of the app"))
                     .font(.system(size: 11, weight: .regular))
                     .foregroundStyle(.tertiary)
             }
