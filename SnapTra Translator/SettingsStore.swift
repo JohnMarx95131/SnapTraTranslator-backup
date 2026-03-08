@@ -32,6 +32,12 @@ final class SettingsStore: ObservableObject {
     @Published var ttsProvider: TTSProvider {
         didSet { defaults.set(ttsProvider.rawValue, forKey: AppSettingKey.ttsProvider) }
     }
+    @Published var appLanguage: AppLanguage {
+        didSet {
+            defaults.set(appLanguage.rawValue, forKey: AppSettingKey.appLanguage)
+            LocalizationManager.shared.setLanguage(appLanguage)
+        }
+    }
 
     private let defaults: UserDefaults
     private static let dictionarySourcesKey = "dictionarySources"
@@ -60,6 +66,10 @@ final class SettingsStore: ObservableObject {
         // Load TTS provider
         let ttsProviderValue = defaults.string(forKey: AppSettingKey.ttsProvider)
         ttsProvider = TTSProvider(rawValue: ttsProviderValue ?? "apple") ?? .apple
+        
+        // Load app language
+        let appLanguageValue = defaults.string(forKey: AppSettingKey.appLanguage)
+        appLanguage = AppLanguage(rawValue: appLanguageValue ?? "system") ?? .system
     }
 
     private static func loadOrMigrateDictionarySources(defaults: UserDefaults) -> [DictionarySource] {

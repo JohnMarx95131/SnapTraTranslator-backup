@@ -88,6 +88,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             }
             .store(in: &cancellables)
 
+        // Listen for language changes to update menu
+        NotificationCenter.default.publisher(for: .languageChanged)
+            .sink { [weak self] _ in
+                self?.updateMenuLanguage()
+            }
+            .store(in: &cancellables)
+
+        // Initialize localization manager with saved language
+        LocalizationManager.shared.setLanguage(model.settings.appLanguage)
+
         Task {
             await refreshAndUpdateVisibility()
         }
@@ -237,6 +247,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             ? NSLocalizedString("Continuous Translation: On", comment: "Continuous translation toggle on")
             : NSLocalizedString("Continuous Translation: Off", comment: "Continuous translation toggle off")
         continuousTranslationMenuItem?.title = continuousTitle
+    }
+
+    private func updateMenuLanguage() {
+        // Recreate menu with new language
+        if let item = statusItem {
+            let menu = createStatusBarMenu()
+            item.menu = menu
+        }
     }
 
     // MARK: - NSMenuDelegate

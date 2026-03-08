@@ -7,10 +7,36 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                // MARK: - General
                 SettingsSectionCard(
-                    title: "Shortcuts",
-                    icon: "keyboard",
+                    title: String(localized: "General"),
+                    icon: "gear",
                     delay: 0
+                ) {
+                    VStack(spacing: 14) {
+                        // App Language Selector
+                        LanguageSelectorRow(
+                            title: String(localized: "App Language"),
+                            subtitle: String(localized: "Change the display language of the app"),
+                            selection: $model.settings.appLanguage
+                        )
+
+                        Divider()
+                            .opacity(0.5)
+
+                        SettingsToggleRow(
+                            title: String(localized: "Launch at login"),
+                            subtitle: String(localized: "Start automatically when you log in"),
+                            isOn: $model.settings.launchAtLogin
+                        )
+                    }
+                }
+
+                // MARK: - Shortcuts
+                SettingsSectionCard(
+                    title: String(localized: "Shortcuts"),
+                    icon: "keyboard",
+                    delay: 0.05
                 ) {
                     SettingsRowView {
                         HotkeyKeycapSelector(selectedKey: $model.settings.singleKey)
@@ -18,15 +44,16 @@ struct SettingsView: View {
                     }
                 }
 
+                // MARK: - Translation
                 SettingsSectionCard(
-                    title: "Behavior",
-                    icon: "gearshape",
-                    delay: 0.05
+                    title: String(localized: "Translation"),
+                    icon: "character.book.closed",
+                    delay: 0.1
                 ) {
                     VStack(spacing: 14) {
                         SettingsToggleRow(
-                            title: "Continuous translation",
-                            subtitle: "Keep translating as mouse moves",
+                            title: String(localized: "Continuous translation"),
+                            subtitle: String(localized: "Keep translating as mouse moves"),
                             isOn: $model.settings.continuousTranslation
                         )
 
@@ -34,40 +61,43 @@ struct SettingsView: View {
                             .opacity(0.5)
 
                         SettingsToggleRow(
-                            title: "Play pronunciation",
-                            subtitle: "Audio playback after translation",
+                            title: String(localized: "Play pronunciation"),
+                            subtitle: String(localized: "Audio playback after translation"),
                             isOn: $model.settings.playPronunciation
                         )
 
                         Divider()
                             .opacity(0.5)
 
-                        SettingsToggleRow(
-                            title: "Launch at login",
-                            subtitle: "Start automatically when you log in",
-                            isOn: $model.settings.launchAtLogin
+                        // TTS Provider Selector
+                        TTSProviderSelectorRow(
+                            title: String(localized: "Pronunciation Service"),
+                            subtitle: String(localized: "Choose the voice service for pronunciation"),
+                            selection: $model.settings.ttsProvider
                         )
                     }
                 }
 
+                // MARK: - Dictionary
                 SettingsSectionCard(
-                    title: String(localized: "Advanced Dictionary"),
+                    title: String(localized: "Dictionary"),
                     icon: "books.vertical",
-                    delay: 0.1
+                    delay: 0.15
                 ) {
                     ECDICTDictionaryRow(manager: model.dictionaryDownload)
                 }
 
+                // MARK: - Permissions
                 SettingsSectionCard(
-                    title: "Permissions",
+                    title: String(localized: "Permissions"),
                     icon: "lock.shield",
-                    delay: 0.15
+                    delay: 0.2
                 ) {
                     VStack(spacing: 14) {
                         PermissionRow(
-                            title: "Screen Recording",
+                            title: String(localized: "Screen Recording"),
                             isGranted: model.permissions.status.screenRecording,
-                            actionTitle: "Open Settings",
+                            actionTitle: String(localized: "Open Settings"),
                             action: { model.permissions.requestAndOpenScreenRecording() }
                         )
 
@@ -82,7 +112,7 @@ struct SettingsView: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: "arrow.clockwise")
                                         .font(.system(size: 11, weight: .medium))
-                                    Text("Refresh Status")
+                                    Text(String(localized: "Refresh Status"))
                                         .font(.system(size: 12, weight: .medium))
                                 }
                             }
@@ -537,5 +567,138 @@ private struct DictionaryBenefitPill: View {
                 Capsule()
                     .fill(Color.secondary.opacity(0.08))
             )
+    }
+}
+
+// MARK: - Language Selector Row
+
+struct LanguageSelectorRow: View {
+    let title: String
+    let subtitle: String
+    @Binding var selection: AppLanguage
+    @State private var isHovering = false
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundStyle(.primary)
+                Text(subtitle)
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(.tertiary)
+            }
+
+            Spacer()
+
+            Menu {
+                ForEach(AppLanguage.allCases) { language in
+                    Button {
+                        selection = language
+                    } label: {
+                        HStack {
+                            Text(language.displayName)
+                                .font(.system(size: 13))
+                            if selection == language {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 11, weight: .semibold))
+                            }
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Text(selection.displayName)
+                        .font(.system(size: 12, weight: .medium))
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 10, weight: .semibold))
+                }
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(.quaternary.opacity(isHovering ? 0.7 : 0.5))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .strokeBorder(.quaternary.opacity(0.5), lineWidth: 0.5)
+                )
+            }
+            .menuStyle(.borderlessButton)
+            .frame(width: 140)
+            .onHover { hovering in
+                isHovering = hovering
+            }
+        }
+    }
+}
+
+// MARK: - TTS Provider Selector Row
+
+struct TTSProviderSelectorRow: View {
+    let title: String
+    let subtitle: String
+    @Binding var selection: TTSProvider
+    @State private var isHovering = false
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundStyle(.primary)
+                Text(subtitle)
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(.tertiary)
+            }
+
+            Spacer()
+
+            Menu {
+                ForEach(TTSProvider.allCases) { provider in
+                    Button {
+                        selection = provider
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(provider.displayName)
+                                    .font(.system(size: 13))
+                                Text(provider.description)
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(.secondary)
+                            }
+                            if selection == provider {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 11, weight: .semibold))
+                            }
+                        }
+                    }
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Text(selection.displayName)
+                        .font(.system(size: 12, weight: .medium))
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 10, weight: .semibold))
+                }
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(.quaternary.opacity(isHovering ? 0.7 : 0.5))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .strokeBorder(.quaternary.opacity(0.5), lineWidth: 0.5)
+                )
+            }
+            .menuStyle(.borderlessButton)
+            .frame(width: 140)
+            .onHover { hovering in
+                isHovering = hovering
+            }
+        }
     }
 }

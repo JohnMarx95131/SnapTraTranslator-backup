@@ -159,6 +159,9 @@
         }
       }
     },
+    "App Language" : {
+
+    },
     "Apple" : {
 
     },
@@ -347,6 +350,9 @@
         }
       }
     },
+    "Change the display language of the app" : {
+
+    },
     "Check for Updates" : {
       "localizations" : {
         "en" : {
@@ -456,8 +462,10 @@
     "Choose file…" : {
 
     },
+    "Choose the voice service for pronunciation" : {
+
+    },
     "Continuous translation" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1502,7 +1510,6 @@
       }
     },
     "Launch at login" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1918,7 +1925,6 @@
       }
     },
     "Permissions" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1953,7 +1959,6 @@
       }
     },
     "Play pronunciation" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2627,7 +2632,6 @@
       }
     },
     "Shortcuts" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2878,6 +2882,9 @@
     "System Dictionary" : {
       "comment" : "System dictionary name"
     },
+    "System Language" : {
+
+    },
     "Tech terms" : {
 
     },
@@ -3018,6 +3025,9 @@
           }
         }
       }
+    },
+    "Translation" : {
+
     },
     "Translation failed: %@" : {
       "localizations" : {

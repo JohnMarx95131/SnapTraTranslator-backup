@@ -86,6 +86,70 @@ enum TTSProvider: String, CaseIterable, Identifiable {
     }
 }
 
+enum AppLanguage: String, CaseIterable, Identifiable {
+    case system = "system"
+    case english = "en"
+    case chineseSimplified = "zh-Hans"
+    case chineseTraditional = "zh-Hant"
+    case japanese = "ja"
+    case korean = "ko"
+    case french = "fr"
+    case german = "de"
+    case spanish = "es"
+    case italian = "it"
+    case portuguese = "pt"
+    case russian = "ru"
+    case arabic = "ar"
+    case thai = "th"
+    case vietnamese = "vi"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .system:
+            return String(localized: "System Language")
+        case .english:
+            return "English"
+        case .chineseSimplified:
+            return "简体中文"
+        case .chineseTraditional:
+            return "繁體中文"
+        case .japanese:
+            return "日本語"
+        case .korean:
+            return "한국어"
+        case .french:
+            return "Français"
+        case .german:
+            return "Deutsch"
+        case .spanish:
+            return "Español"
+        case .italian:
+            return "Italiano"
+        case .portuguese:
+            return "Português"
+        case .russian:
+            return "Русский"
+        case .arabic:
+            return "العربية"
+        case .thai:
+            return "ไทย"
+        case .vietnamese:
+            return "Tiếng Việt"
+        }
+    }
+
+    var localeIdentifier: String? {
+        switch self {
+        case .system:
+            return nil
+        default:
+            return rawValue
+        }
+    }
+}
+
 enum AppSettingKey {
     static let playPronunciation = "playPronunciation"
     static let launchAtLogin = "launchAtLogin"
@@ -96,4 +160,5 @@ enum AppSettingKey {
     static let continuousTranslation = "continuousTranslation"
     static let lastScreenRecordingStatus = "lastScreenRecordingStatus"
     static let ttsProvider = "ttsProvider"
+    static let appLanguage = "appLanguage"
 }

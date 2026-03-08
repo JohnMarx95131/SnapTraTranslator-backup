@@ -111,6 +111,15 @@ struct GeneralSettingsView: View {
 
                 // Settings Section
                 VStack(spacing: 0) {
+                    // App Language Picker
+                    AppLanguagePickerRow(
+                        language: $model.settings.appLanguage
+                    )
+
+                    Divider()
+                        .padding(.horizontal, 14)
+                        .opacity(0.5)
+
                     HotkeyKeycapSelector(selectedKey: $model.settings.singleKey)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 14)
@@ -481,6 +490,36 @@ struct TTSProviderPickerRow: View {
             }
             .labelsHidden()
             .pickerStyle(.menu)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+    }
+}
+
+// MARK: - App Language Picker
+
+struct AppLanguagePickerRow: View {
+    @Binding var language: AppLanguage
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(String(localized: "App Language"))
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundStyle(.primary)
+                Text(String(localized: "Change the display language of the app"))
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(.tertiary)
+            }
+            Spacer()
+            Picker("", selection: $language) {
+                ForEach(AppLanguage.allCases) { lang in
+                    Text(lang.displayName).tag(lang)
+                }
+            }
+            .labelsHidden()
+            .pickerStyle(.menu)
+            .frame(minWidth: 120)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
