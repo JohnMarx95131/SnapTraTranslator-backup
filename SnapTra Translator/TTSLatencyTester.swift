@@ -58,7 +58,8 @@ final class TTSLatencyTester: ObservableObject {
                 text: testText,
                 language: "en",
                 provider: provider,
-                useAmericanAccent: true
+                useAmericanAccent: true,
+                disableCache: true
             )
             let elapsed = Date().timeIntervalSince(start) * 1000
             return .success(elapsed)

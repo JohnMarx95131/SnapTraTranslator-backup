@@ -161,32 +161,37 @@ final class TTSServiceFactory {
         text: String,
         language: String?,
         provider: TTSProvider,
-        useAmericanAccent: Bool
+        useAmericanAccent: Bool,
+        disableCache: Bool = false
     ) async throws -> Data {
         switch provider {
         case .youdao:
             return try await youdaoService.fetchAudio(
                 text: text,
                 language: language,
-                useAmericanAccent: useAmericanAccent
+                useAmericanAccent: useAmericanAccent,
+                disableCache: disableCache
             )
         case .bing:
             return try await bingService.fetchAudio(
                 text: text,
                 language: language,
-                useAmericanAccent: useAmericanAccent
+                useAmericanAccent: useAmericanAccent,
+                disableCache: disableCache
             )
         case .google:
             return try await googleService.fetchAudio(
                 text: text,
                 language: language,
-                useAmericanAccent: useAmericanAccent
+                useAmericanAccent: useAmericanAccent,
+                disableCache: disableCache
             )
         case .baidu:
             return try await baiduService.fetchAudio(
                 text: text,
                 language: language,
-                useAmericanAccent: useAmericanAccent
+                useAmericanAccent: useAmericanAccent,
+                disableCache: disableCache
             )
         case .apple:
             throw TTSError.unsupportedProvider
@@ -232,10 +237,18 @@ final class YoudaoTTSService {
     private let baseURL = "https://dict.youdao.com/dictvoice"
     private let logger = Logger(subsystem: "com.yelog.SnapTra-Translator", category: "YoudaoTTS")
     
+    private let uncachedSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        config.urlCache = nil
+        return URLSession(configuration: config)
+    }()
+    
     func fetchAudio(
         text: String,
         language: String?,
-        useAmericanAccent: Bool
+        useAmericanAccent: Bool,
+        disableCache: Bool = false
     ) async throws -> Data {
         let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let langCode = languageCode(for: language)
@@ -248,7 +261,8 @@ final class YoudaoTTSService {
         
         logger.info("📡 Requesting Youdao TTS: \(url.absoluteString)")
         
-        let (data, response) = try await URLSession.shared.data(from: url)
+        let session = disableCache ? uncachedSession : URLSession.shared
+        let (data, response) = try await session.data(from: url)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             logger.error("❌ Invalid response type")
@@ -302,10 +316,18 @@ final class BaiduTTSService {
     private let baseURL = "https://fanyi.baidu.com/gettts"
     private let logger = Logger(subsystem: "com.yelog.SnapTra-Translator", category: "BaiduTTS")
     
+    private let uncachedSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        config.urlCache = nil
+        return URLSession(configuration: config)
+    }()
+    
     func fetchAudio(
         text: String,
         language: String?,
-        useAmericanAccent: Bool
+        useAmericanAccent: Bool,
+        disableCache: Bool = false
     ) async throws -> Data {
         // Baidu has 1000 character limit
         let trimmedText = String(text.prefix(1000))
@@ -327,7 +349,8 @@ final class BaiduTTSService {
         
         logger.info("📡 Requesting Baidu TTS: \(url.absoluteString)")
         
-        let (data, response) = try await URLSession.shared.data(from: url)
+        let session = disableCache ? uncachedSession : URLSession.shared
+        let (data, response) = try await session.data(from: url)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             logger.error("❌ Invalid response type")
@@ -590,7 +613,8 @@ final class BingTTSService {
     func fetchAudio(
         text: String,
         language: String?,
-        useAmericanAccent: Bool = true
+        useAmericanAccent: Bool = true,
+        disableCache: Bool = false
     ) async throws -> Data {
         logger.info("🔄 Bing TTS using Edge TTS backend")
         let edgeService = EdgeTTSService()
@@ -602,11 +626,19 @@ final class BingTTSService {
 
 final class GoogleTTSService {
     private let logger = Logger(subsystem: "com.yelog.SnapTra-Translator", category: "GoogleTTS")
+    
+    private let uncachedSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        config.urlCache = nil
+        return URLSession(configuration: config)
+    }()
 
     func fetchAudio(
         text: String,
         language: String?,
-        useAmericanAccent: Bool = true
+        useAmericanAccent: Bool = true,
+        disableCache: Bool = false
     ) async throws -> Data {
         logger.info("📡 Requesting Google TTS...")
 
@@ -629,7 +661,8 @@ final class GoogleTTSService {
         )
         request.setValue("https://translate.google.com/", forHTTPHeaderField: "Referer")
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let session = disableCache ? uncachedSession : URLSession.shared
+        let (data, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw TTSError.invalidResponse
