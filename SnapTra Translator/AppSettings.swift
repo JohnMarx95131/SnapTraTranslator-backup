@@ -132,4 +132,25 @@ enum AppSettingKey {
     static let lastScreenRecordingStatus = "lastScreenRecordingStatus"
     static let ttsProvider = "ttsProvider"
     static let appLanguage = "appLanguage"
+    static let englishAccent = "englishAccent"
+}
+
+enum EnglishAccent: String, CaseIterable, Identifiable {
+    case american = "en-US"
+    case british = "en-GB"
+    
+    var id: String { rawValue }
+    
+    var displayName: String {
+        switch self {
+        case .american:
+            return L("American (US)")
+        case .british:
+            return L("British (UK)")
+        }
+    }
+    
+    var isAmerican: Bool {
+        self == .american
+    }
 }

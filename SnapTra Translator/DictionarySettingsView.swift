@@ -242,6 +242,40 @@ struct DictionarySettingsView: View {
             }
             .padding(.horizontal)
 
+            // English Accent Selection (only for third-party services)
+            if model.settings.ttsProvider != .apple {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(L("English Accent"))
+                            .font(.system(size: 13))
+                        Spacer()
+                        Picker("", selection: $model.settings.englishAccent) {
+                            ForEach(EnglishAccent.allCases) { accent in
+                                Text(accent.displayName).tag(accent)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .frame(width: 180)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color(nsColor: .controlBackgroundColor))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .strokeBorder(.quaternary, lineWidth: 0.5)
+                    )
+                    .padding(.horizontal)
+                    
+                    Text(L("Apple uses system voice and does not support accent selection"))
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .padding(.horizontal)
+                }
+            }
+
             HStack {
                 Spacer()
                 Button {

@@ -344,7 +344,7 @@ final class AppModel: ObservableObject {
                     selected.text,
                     language: languageCode,
                     provider: settings.ttsProvider,
-                    useAmericanAccent: true
+                    useAmericanAccent: settings.englishAccent.isAmerican
                 )
             }
             guard !Task.isCancelled, activeLookupID == lookupID else { return }

@@ -173,12 +173,14 @@ final class TTSServiceFactory {
         case .bing:
             return try await bingService.fetchAudio(
                 text: text,
-                language: language
+                language: language,
+                useAmericanAccent: useAmericanAccent
             )
         case .google:
             return try await googleService.fetchAudio(
                 text: text,
-                language: language
+                language: language,
+                useAmericanAccent: useAmericanAccent
             )
         case .baidu:
             return try await baiduService.fetchAudio(
@@ -386,7 +388,7 @@ final class EdgeTTSService {
     private let userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         + " (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
 
-    func fetchAudio(text: String, language: String?) async throws -> Data {
+    func fetchAudio(text: String, language: String?, useAmericanAccent: Bool = true) async throws -> Data {
         logger.info("🌐 Starting Edge TTS (URLSession WebSocket)...")
 
         let connectionId = UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
@@ -424,8 +426,8 @@ final class EdgeTTSService {
                 self.logger.debug("📤 Config sent")
 
                 // Send SSML
-                let voiceName = self.getVoiceName(language: language)
-                let ssml = self.generateSSML(text: text, voiceName: voiceName)
+                let voiceName = Self.getVoiceName(language: language, useAmericanAccent: useAmericanAccent)
+                let ssml = Self.generateSSML(text: text, voiceName: voiceName)
                 try await task.send(.string(self.createSSMLMessage(ssml: ssml)))
                 self.logger.debug("📤 SSML sent")
 
@@ -535,15 +537,15 @@ final class EdgeTTSService {
             ],
         ]
         let json = String(data: try! JSONSerialization.data(withJSONObject: config), encoding: .utf8)!
-        return "X-Timestamp:\(getTimestamp())\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n\(json)"
+        return "X-Timestamp:\(Self.getTimestamp())\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n\(json)"
     }
 
     private func createSSMLMessage(ssml: String) -> String {
         let requestId = UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
-        return "X-Timestamp:\(getTimestamp())\r\nContent-Type:application/ssml+xml\r\nX-RequestId:\(requestId)\r\nPath:ssml\r\n\r\n\(ssml)"
+        return "X-Timestamp:\(Self.getTimestamp())\r\nContent-Type:application/ssml+xml\r\nX-RequestId:\(requestId)\r\nPath:ssml\r\n\r\n\(ssml)"
     }
 
-    private func generateSSML(text: String, voiceName: String) -> String {
+    private nonisolated static func generateSSML(text: String, voiceName: String) -> String {
         let escaped = text
             .replacingOccurrences(of: "&", with: "&amp;")
             .replacingOccurrences(of: "<", with: "&lt;")
@@ -554,25 +556,26 @@ final class EdgeTTSService {
             + "</voice></speak>"
     }
 
-    private func getVoiceName(language: String?) -> String {
-        let voiceMap: [String: String] = [
-            "en":      "en-US-AriaNeural",
-            "zh":      "zh-CN-XiaoxiaoNeural",
-            "zh-Hans": "zh-CN-XiaoxiaoNeural",
-            "zh-Hant": "zh-TW-HsiaoChenNeural",
-            "ja":      "ja-JP-NanamiNeural",
-            "ko":      "ko-KR-SunHiNeural",
-            "fr":      "fr-FR-DeniseNeural",
-            "de":      "de-DE-KatjaNeural",
-            "es":      "es-ES-ElviraNeural",
-            "it":      "it-IT-ElsaNeural",
-            "pt":      "pt-BR-FranciscaNeural",
-            "ru":      "ru-RU-SvetlanaNeural",
+    private nonisolated static func getVoiceName(language: String?, useAmericanAccent: Bool) -> String {
+        let voiceMap: [String: (american: String, british: String)] = [
+            "en":      ("en-US-AriaNeural", "en-GB-SoniaNeural"),
+            "zh":      ("zh-CN-XiaoxiaoNeural", "zh-CN-XiaoxiaoNeural"),
+            "zh-Hans": ("zh-CN-XiaoxiaoNeural", "zh-CN-XiaoxiaoNeural"),
+            "zh-Hant": ("zh-TW-HsiaoChenNeural", "zh-TW-HsiaoChenNeural"),
+            "ja":      ("ja-JP-NanamiNeural", "ja-JP-NanamiNeural"),
+            "ko":      ("ko-KR-SunHiNeural", "ko-KR-SunHiNeural"),
+            "fr":      ("fr-FR-DeniseNeural", "fr-FR-DeniseNeural"),
+            "de":      ("de-DE-KatjaNeural", "de-DE-KatjaNeural"),
+            "es":      ("es-ES-ElviraNeural", "es-ES-ElviraNeural"),
+            "it":      ("it-IT-ElsaNeural", "it-IT-ElsaNeural"),
+            "pt":      ("pt-BR-FranciscaNeural", "pt-BR-FranciscaNeural"),
+            "ru":      ("ru-RU-SvetlanaNeural", "ru-RU-SvetlanaNeural"),
         ]
-        return voiceMap[language ?? "en"] ?? "en-US-AriaNeural"
+        let voices = voiceMap[language ?? "en"] ?? ("en-US-AriaNeural", "en-GB-SoniaNeural")
+        return useAmericanAccent ? voices.american : voices.british
     }
 
-    private func getTimestamp() -> String {
+    private nonisolated static func getTimestamp() -> String {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return f.string(from: Date())
@@ -586,11 +589,12 @@ final class BingTTSService {
     
     func fetchAudio(
         text: String,
-        language: String?
+        language: String?,
+        useAmericanAccent: Bool = true
     ) async throws -> Data {
         logger.info("🔄 Bing TTS using Edge TTS backend")
         let edgeService = EdgeTTSService()
-        return try await edgeService.fetchAudio(text: text, language: language)
+        return try await edgeService.fetchAudio(text: text, language: language, useAmericanAccent: useAmericanAccent)
     }
 }
 
@@ -601,13 +605,14 @@ final class GoogleTTSService {
 
     func fetchAudio(
         text: String,
-        language: String?
+        language: String?,
+        useAmericanAccent: Bool = true
     ) async throws -> Data {
         logger.info("📡 Requesting Google TTS...")
 
         // Google TTS has 100 character limit per request
         let trimmedText = String(text.prefix(100))
-        let langCode = googleLanguageCode(for: language)
+        let langCode = googleLanguageCode(for: language, useAmericanAccent: useAmericanAccent)
         let encodedText = trimmedText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
 
         // Use the translate_tts endpoint which directly returns MP3 audio.
@@ -640,11 +645,11 @@ final class GoogleTTSService {
         return data
     }
 
-    private func googleLanguageCode(for language: String?) -> String {
-        guard let language = language else { return "en" }
+    private func googleLanguageCode(for language: String?, useAmericanAccent: Bool) -> String {
+        guard let language = language else { return useAmericanAccent ? "en" : "en-GB" }
 
         let languageMap: [String: String] = [
-            "en": "en",
+            "en": useAmericanAccent ? "en" : "en-GB",
             "zh": "zh-CN",
             "zh-Hans": "zh-CN",
             "zh-Hant": "zh-TW",

@@ -39,6 +39,9 @@ final class SettingsStore: ObservableObject {
             LocalizationManager.shared.setLanguage(appLanguage)
         }
     }
+    @Published var englishAccent: EnglishAccent {
+        didSet { defaults.set(englishAccent.rawValue, forKey: AppSettingKey.englishAccent) }
+    }
 
     private let defaults: UserDefaults
     private static let dictionarySourcesKey = "dictionarySources"
@@ -72,6 +75,10 @@ final class SettingsStore: ObservableObject {
         // Load app language
         let appLanguageValue = defaults.string(forKey: AppSettingKey.appLanguage)
         appLanguage = AppLanguage(rawValue: appLanguageValue ?? "system") ?? .system
+        
+        // Load English accent preference
+        let englishAccentValue = defaults.string(forKey: AppSettingKey.englishAccent)
+        englishAccent = EnglishAccent(rawValue: englishAccentValue ?? "en-US") ?? .american
     }
 
     private static func loadOrMigrateDictionarySources(defaults: UserDefaults) -> [DictionarySource] {
