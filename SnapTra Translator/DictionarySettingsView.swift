@@ -5,6 +5,7 @@
 //  Dictionary management tab with priority ordering.
 //
 
+import AppKit
 import SwiftUI
 
 struct TTSServiceRow: View {
@@ -24,11 +25,9 @@ struct TTSServiceRow: View {
                     }
                 }
             
-            Image(systemName: iconName)
-                .font(.system(size: 16))
-                .foregroundStyle(iconColor)
-                .frame(width: 24)
-            
+            providerIcon
+                .frame(width: 24, height: 24)
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(provider.displayName)
                     .font(.system(size: 13, weight: .medium))
@@ -36,9 +35,9 @@ struct TTSServiceRow: View {
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
             }
-            
+
             Spacer()
-            
+
             latencyView
         }
         .padding(.horizontal, 12)
@@ -48,27 +47,33 @@ struct TTSServiceRow: View {
             onSelect()
         }
     }
-    
-    private var iconName: String {
+
+    @ViewBuilder
+    private var providerIcon: some View {
         switch provider {
-        case .apple: return "speaker.wave.2.fill"
-        case .youdao: return "globe.asia.australia.fill"
-        case .bing: return "magnifyingglass.circle.fill"
-        case .google: return "book.fill"
-        case .baidu: return "speaker.circle.fill"
+        case .apple:
+            Image(systemName: "apple.logo")
+                .font(.system(size: 16))
+                .foregroundStyle(.secondary)
+        case .youdao:
+            Image("TTSYoudao")
+                .resizable()
+                .interpolation(.high)
+        case .bing:
+            Image("TTSBing")
+                .resizable()
+                .interpolation(.high)
+        case .google:
+            Image("TTSGoogle")
+                .resizable()
+                .interpolation(.high)
+        case .baidu:
+            Image("TTSBaidu")
+                .resizable()
+                .interpolation(.high)
         }
     }
-    
-    private var iconColor: Color {
-        switch provider {
-        case .apple: return .secondary
-        case .youdao: return .red
-        case .bing: return .blue
-        case .google: return .green
-        case .baidu: return .blue
-        }
-    }
-    
+
     private var subtitleText: String {
         provider.description
     }
@@ -159,6 +164,7 @@ struct DictionarySettingsView: View {
     @State private var sources: [DictionarySource] = []
     @StateObject private var ttsTester = TTSLatencyTester()
     @State private var hasTestedTTS = false
+    var hidesScrollIndicator: Bool = false
 
     var body: some View {
         ScrollView {
@@ -170,7 +176,13 @@ struct DictionarySettingsView: View {
                 
                 ttsSection
             }
+            .background(
+                ScrollViewScrollerConfigurator(
+                    hidesVerticalScroller: hidesScrollIndicator
+                )
+            )
         }
+        .scrollIndicators(hidesScrollIndicator ? .hidden : .automatic, axes: .vertical)
         .onAppear {
             loadSources()
             if !hasTestedTTS {
@@ -422,6 +434,43 @@ struct DictionarySettingsView: View {
     private func moveSource(from indices: IndexSet, to offset: Int) {
         sources.move(fromOffsets: indices, toOffset: offset)
         updateSources()
+    }
+}
+
+private struct ScrollViewScrollerConfigurator: NSViewRepresentable {
+    let hidesVerticalScroller: Bool
+
+    func makeNSView(context: Context) -> NSView {
+        NSView(frame: .zero)
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            guard let scrollView = nsView.enclosingScrollView ?? nsView.firstSuperview(of: NSScrollView.self) else {
+                return
+            }
+
+            scrollView.scrollerStyle = .overlay
+            scrollView.autohidesScrollers = true
+            scrollView.hasHorizontalScroller = false
+            scrollView.hasVerticalScroller = !hidesVerticalScroller
+            scrollView.verticalScroller?.isHidden = hidesVerticalScroller
+            scrollView.verticalScroller?.alphaValue = hidesVerticalScroller ? 0 : 1
+            scrollView.reflectScrolledClipView(scrollView.contentView)
+        }
+    }
+}
+
+private extension NSView {
+    func firstSuperview<T: NSView>(of type: T.Type) -> T? {
+        var candidate = superview
+        while let view = candidate {
+            if let match = view as? T {
+                return match
+            }
+            candidate = view.superview
+        }
+        return nil
     }
 }
 
