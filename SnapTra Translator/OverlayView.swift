@@ -160,8 +160,8 @@ struct OverlayView: View {
         case .advancedDictionary:
             return (
                 String(localized: "Advanced Dictionary"),
-                "sparkles",
-                .green
+                "book.closed",
+                .secondary
             )
         case .wordNet:
             return (
