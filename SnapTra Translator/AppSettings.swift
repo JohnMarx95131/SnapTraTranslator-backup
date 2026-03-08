@@ -70,13 +70,13 @@ enum TTSProvider: String, CaseIterable, Identifiable {
         case .apple:
             return L("System built-in, works offline")
         case .youdao:
-            return L("No token required, supports UK/US accent")
+            return L("Clear word pronunciation")
         case .bing:
-            return L("Best quality, WebSocket based")
+            return L("High quality neural voice")
         case .google:
-            return L("Good quality, requires signature")
+            return L("Google Translate voice")
         case .baidu:
-            return L("No token required, supports UK/US accent")
+            return L("Natural pronunciation")
         }
     }
 }
