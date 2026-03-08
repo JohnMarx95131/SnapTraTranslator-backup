@@ -6,19 +6,47 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		49229076477461F5BCBECBC3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0878597B29F37191DDAD9BF /* Cocoa.framework */; };
+		4948C18D22CBE0101C82D281 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423F1844E7A13D4E51660DC4 /* SmokeTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0B9ED250597902B4C19677D1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D3F4D8F62F14D1A2004035A9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D3F4D8FD2F14D1A2004035A9;
+			remoteInfo = "SnapTra Translator";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		423F1844E7A13D4E51660DC4 /* SmokeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
+		CA9FDDCF14665092D5945F0C /* SnapTra TranslatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SnapTra TranslatorTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0878597B29F37191DDAD9BF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		D3F4D8FE2F14D1A2004035A9 /* SnapTra Translator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SnapTra Translator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D3F4D9002F14D1A2004035A9 /* SnapTra Translator */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = "SnapTra Translator";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4B19301CB96DBA9240D49A03 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				49229076477461F5BCBECBC3 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D3F4D8FB2F14D1A2004035A9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -29,11 +57,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		19CD748240B3E3D9B0E9FA7E /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				D0878597B29F37191DDAD9BF /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		3DFC401EADC873869CDA871C /* SnapTra TranslatorTests */ = {
+			isa = PBXGroup;
+			children = (
+				423F1844E7A13D4E51660DC4 /* SmokeTests.swift */,
+			);
+			name = "SnapTra TranslatorTests";
+			path = "SnapTra TranslatorTests";
+			sourceTree = "<group>";
+		};
+		C7EF4C4004077096DF2DE413 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				19CD748240B3E3D9B0E9FA7E /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		D3F4D8F52F14D1A2004035A9 = {
 			isa = PBXGroup;
 			children = (
 				D3F4D9002F14D1A2004035A9 /* SnapTra Translator */,
 				D3F4D8FF2F14D1A2004035A9 /* Products */,
+				3DFC401EADC873869CDA871C /* SnapTra TranslatorTests */,
+				C7EF4C4004077096DF2DE413 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -41,6 +96,7 @@
 			isa = PBXGroup;
 			children = (
 				D3F4D8FE2F14D1A2004035A9 /* SnapTra Translator.app */,
+				CA9FDDCF14665092D5945F0C /* SnapTra TranslatorTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -64,11 +120,27 @@
 				D3F4D9002F14D1A2004035A9 /* SnapTra Translator */,
 			);
 			name = "SnapTra Translator";
-			packageProductDependencies = (
-			);
 			productName = "Snap Translate";
 			productReference = D3F4D8FE2F14D1A2004035A9 /* SnapTra Translator.app */;
 			productType = "com.apple.product-type.application";
+		};
+		FED1CBA877953D929370FCE6 /* SnapTra TranslatorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A936E6C5F803A6BBF2502133 /* Build configuration list for PBXNativeTarget "SnapTra TranslatorTests" */;
+			buildPhases = (
+				AADE5F464D253F136729A360 /* Sources */,
+				4B19301CB96DBA9240D49A03 /* Frameworks */,
+				1774C0ED8884E4BA8473D002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B03FE28491E7A5BA3E8F8F7B /* PBXTargetDependency */,
+			);
+			name = "SnapTra TranslatorTests";
+			productName = "SnapTra TranslatorTests";
+			productReference = CA9FDDCF14665092D5945F0C /* SnapTra TranslatorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -104,11 +176,19 @@
 			projectRoot = "";
 			targets = (
 				D3F4D8FD2F14D1A2004035A9 /* SnapTra Translator */,
+				FED1CBA877953D929370FCE6 /* SnapTra TranslatorTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1774C0ED8884E4BA8473D002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D3F4D8FC2F14D1A2004035A9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -119,6 +199,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		AADE5F464D253F136729A360 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4948C18D22CBE0101C82D281 /* SmokeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D3F4D8FA2F14D1A2004035A9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -128,7 +216,44 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		B03FE28491E7A5BA3E8F8F7B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "SnapTra Translator";
+			target = D3F4D8FD2F14D1A2004035A9 /* SnapTra Translator */;
+			targetProxy = 0B9ED250597902B4C19677D1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		0FAEB8F97B598EFB7D39DB94 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4MF263RHY3;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				PRODUCT_BUNDLE_IDENTIFIER = org.yelog.SnapTraTranslateTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		998FCF38ACDD712A119D9D87 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4MF263RHY3;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				PRODUCT_BUNDLE_IDENTIFIER = org.yelog.SnapTraTranslateTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		D3F4D9072F14D1A3004035A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -328,6 +453,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A936E6C5F803A6BBF2502133 /* Build configuration list for PBXNativeTarget "SnapTra TranslatorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				998FCF38ACDD712A119D9D87 /* Release */,
+				0FAEB8F97B598EFB7D39DB94 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		D3F4D8F92F14D1A2004035A9 /* Build configuration list for PBXProject "SnapTra Translator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
