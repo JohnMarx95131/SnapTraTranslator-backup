@@ -93,6 +93,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case chineseTraditional = "zh-Hant"
     case japanese = "ja"
     case korean = "ko"
+    case spanish = "es"
 
     var id: String { rawValue }
 
@@ -110,6 +111,8 @@ enum AppLanguage: String, CaseIterable, Identifiable {
             return "日本語"
         case .korean:
             return "한국어"
+        case .spanish:
+            return "Español"
         }
     }
 

@@ -2,13 +2,34 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     "%lld%%" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        }
+      }
     },
     "© 2025 yelog. All rights reserved." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "© 2025 yelog. Todos los derechos reservados."
+          }
+        }
+      }
     },
     "About" : {
       "comment" : "About menu item",
@@ -18,6 +39,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "About"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de"
           }
         },
         "ja" : {
@@ -56,6 +83,12 @@
             "value" : "About SnapTra"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de SnapTra"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -92,6 +125,12 @@
             "value" : "About SnapTra Translator"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de SnapTra Translator"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -119,10 +158,56 @@
       }
     },
     "Advanced Dictionary" : {
-      "comment" : "ECDICT name"
+      "comment" : "ECDICT name",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced Dictionary"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diccionario avanzado"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高度な辞書"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "고급 사전"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高级字典"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高級字典"
+          }
+        }
+      }
     },
     "Advanced English Dictionary" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diccionario avanzado de inglés"
+          }
+        }
+      }
     },
     "Advanced offline dictionary" : {
       "extractionState" : "stale",
@@ -131,6 +216,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Advanced offline dictionary"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diccionario avanzado sin conexión"
           }
         },
         "ja" : {
@@ -168,6 +259,12 @@
             "value" : "App Language"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idioma de la aplicación"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -190,6 +287,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "العربية"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Árabe"
           }
         },
         "ja" : {
@@ -227,6 +330,12 @@
             "value" : "Audio playback after translation"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducción de audio después de la traducción"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -260,6 +369,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Behavior"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comportamiento"
           }
         },
         "ja" : {
@@ -297,6 +412,12 @@
             "value" : "Best quality, requires token"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mejor calidad, requiere token"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -320,6 +441,12 @@
             "value" : "Best quality, WebSocket based"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mejor calidad, basado en WebSocket"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -340,6 +467,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         },
         "ja" : {
@@ -377,6 +510,12 @@
             "value" : "Capture failed"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de captura"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -412,6 +551,12 @@
             "value" : "Change the display language of the app"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar el idioma de visualización de la aplicación"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -433,6 +578,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Check for Updates"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar actualizaciones"
           }
         },
         "ja" : {
@@ -471,6 +622,12 @@
             "value" : "简体中文"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chino (Simplificado)"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -505,6 +662,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "繁體中文"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chino (Tradicional)"
           }
         },
         "ja" : {
@@ -542,6 +705,12 @@
             "value" : "Chinese-English Auto Mutual Translation"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducción automática mutua Chino-Inglés"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -557,7 +726,14 @@
       }
     },
     "Choose file…" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir archivo…"
+          }
+        }
+      }
     },
     "Continuous translation" : {
       "extractionState" : "stale",
@@ -566,6 +742,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Continuous translation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducción continua"
           }
         },
         "ja" : {
@@ -601,6 +783,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Continuous Translation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducción continua"
           }
         },
         "ja" : {
@@ -639,6 +827,12 @@
             "value" : "Continuous Translation: Off"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducción continua: Apagada"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -675,6 +869,12 @@
             "value" : "Continuous Translation: On"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducción continua: Encendida"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -707,6 +907,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copy to clipboard"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar al portapapeles"
           }
         },
         "ja" : {
@@ -744,6 +950,12 @@
             "value" : "Debug OCR Region"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depurar región OCR"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -777,6 +989,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dictionary"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diccionario"
           }
         },
         "ja" : {
@@ -814,6 +1032,12 @@
             "value" : "Dictionary Priority"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prioridad del diccionario"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -849,6 +1073,12 @@
             "value" : "Download"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargar"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -875,6 +1105,47 @@
         }
       }
     },
+    "Drag the handle to reorder lookup priority. The first enabled dictionary will be queried first." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag the handle to reorder lookup priority. The first enabled dictionary will be queried first."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrastre el control para reordenar la prioridad de búsqueda. El primer diccionario habilitado se consultará primero."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ハンドルをドラッグして検索優先順位を並べ替えます。最初に有効になった辞書が最初に検索されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "핸들을 드래그하여 조회 우선순위를 재정렬하세요. 첫 번째로 활성화된 사전이 먼저 조회됩니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拖动手柄以重新排序查询优先级。第一个启用的字典将首先被查询。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拖動手柄以重新排序查詢優先級。第一個啟用的字典將首先被查詢。"
+          }
+        }
+      }
+    },
     "Drag to reorder lookup priority. The first enabled dictionary will be queried first." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -882,6 +1153,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Drag to reorder lookup priority. The first enabled dictionary will be queried first."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrastre para reordenar la prioridad de búsqueda. El primer diccionario habilitado se consultará primero."
           }
         },
         "ja" : {
@@ -919,6 +1196,12 @@
             "value" : "ECDICT - Comprehensive offline dictionary"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ECDICT - Diccionario integral sin conexión"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -954,6 +1237,12 @@
             "value" : "Enable Screen Recording"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Habilitar grabación de pantalla"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -981,7 +1270,14 @@
       }
     },
     "Enabled" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Habilitado"
+          }
+        }
+      }
     },
     "English" : {
       "comment" : "Language name - use native name",
@@ -991,6 +1287,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "English"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inglés"
           }
         },
         "ja" : {
@@ -1019,6 +1321,47 @@
         }
       }
     },
+    "English definitions and synonyms" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English definitions and synonyms"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definiciones y sinónimos en inglés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "英語の定義と類義語"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "영어 정의 및 동의어"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "英语定义和同义词"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "英語定義和同義詞"
+          }
+        }
+      }
+    },
     "Fixed Translation Direction" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1026,6 +1369,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixed Translation Direction"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dirección de traducción fija"
           }
         },
         "zh-Hans" : {
@@ -1050,6 +1399,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Français"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Francés"
           }
         },
         "ja" : {
@@ -1079,12 +1434,25 @@
       }
     },
     "Fuller definitions" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Definiciones más completas"
+          }
+        }
+      }
     },
     "General" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "General"
@@ -1126,6 +1494,12 @@
             "value" : "Deutsch"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alemán"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1161,6 +1535,12 @@
             "value" : "Good quality, requires signature"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buena calidad, requiere firma"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1181,6 +1561,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Granted"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concedido"
           }
         },
         "ja" : {
@@ -1218,6 +1604,12 @@
             "value" : "Hotkey"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tecla de acceso rápido"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1253,6 +1645,12 @@
             "value" : "If SnapTra helps you, a ⭐ on GitHub means a lot!"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si SnapTra te ayuda, una ⭐ en GitHub significa mucho."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1280,10 +1678,65 @@
       }
     },
     "Install" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalar"
+          }
+        }
+      }
+    },
+    "Installation failed" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installation failed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalación fallida"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インストールに失敗しました"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설치 실패"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安装失败"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安裝失敗"
+          }
+        }
+      }
     },
     "Installing" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalando"
+          }
+        }
+      }
     },
     "Installing..." : {
       "extractionState" : "stale",
@@ -1292,6 +1745,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Installing..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instalando..."
           }
         },
         "ja" : {
@@ -1325,6 +1784,12 @@
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Italiano"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Italiano"
@@ -1366,6 +1831,12 @@
             "value" : "日本語"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japonés"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1399,6 +1870,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keep translating as mouse moves"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seguir traduciendo al mover el ratón"
           }
         },
         "ja" : {
@@ -1437,6 +1914,12 @@
             "value" : "한국어"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coreano"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1470,6 +1953,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Language pack installed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paquete de idioma instalado"
           }
         },
         "ja" : {
@@ -1507,6 +1996,12 @@
             "value" : "Language pack not installed."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paquete de idioma no instalado."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1540,6 +2035,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Language Pack Required"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paquete de idioma requerido"
           }
         },
         "ja" : {
@@ -1577,6 +2078,12 @@
             "value" : "Language pack required - click to download"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paquete de idioma requerido - haga clic para descargar"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1610,6 +2117,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Language pack required. Please download in System Settings > General > Language & Region > Translation."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paquete de idioma requerido. Descárguelo en Configuración del sistema > General > Idioma y región > Traducción."
           }
         },
         "ja" : {
@@ -1647,6 +2160,12 @@
             "value" : "Launch at login"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar al iniciar sesión"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1680,6 +2199,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Launch at Login"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar al iniciar sesión"
           }
         },
         "ja" : {
@@ -1717,6 +2242,12 @@
             "value" : "Left Command"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comando izquierdo"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1750,6 +2281,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Left Control"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control izquierdo"
           }
         },
         "ja" : {
@@ -1787,6 +2324,12 @@
             "value" : "Left Option"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opción izquierda"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1820,6 +2363,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Left Shift"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shift izquierdo"
           }
         },
         "ja" : {
@@ -1857,6 +2406,12 @@
             "value" : "macOS built-in dictionary"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diccionario integrado de macOS"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1890,6 +2445,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Move your cursor over a word and press the shortcut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueva el cursor sobre una palabra y pulse el atajo"
           }
         },
         "ja" : {
@@ -1927,6 +2488,12 @@
             "value" : "Move your cursor over a word and press the shortcut to translate"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueva el cursor sobre una palabra y pulse el atajo para traducir"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1962,6 +2529,12 @@
             "value" : "No token required, supports UK/US accent"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No requiere token, admite acento británico/estadounidense"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1982,6 +2555,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No word detected"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se detectó ninguna palabra"
           }
         },
         "ja" : {
@@ -2018,6 +2597,12 @@
             "value" : "Not granted"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No concedido"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2044,6 +2629,47 @@
         }
       }
     },
+    "Not installed" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not installed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No instalado"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未インストール"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설치되지 않음"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未安装"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未安裝"
+          }
+        }
+      }
+    },
     "Open Settings" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2051,6 +2677,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir configuración"
           }
         },
         "ja" : {
@@ -2088,6 +2720,12 @@
             "value" : "Permissions"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisos"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2123,6 +2761,12 @@
             "value" : "Play pronunciation"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducir pronunciación"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2156,6 +2800,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Play Pronunciation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reproducir pronunciación"
           }
         },
         "ja" : {
@@ -2194,6 +2844,12 @@
             "value" : "Português"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portugués"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2221,7 +2877,14 @@
       }
     },
     "Powered by ECDICT" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desarrollado por ECDICT"
+          }
+        }
+      }
     },
     "Pronunciation Service" : {
       "extractionState" : "stale",
@@ -2230,6 +2893,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pronunciation Service"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servicio de pronunciación"
           }
         },
         "zh-Hans" : {
@@ -2254,6 +2923,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pronunciation: Off"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pronunciación: Apagada"
           }
         },
         "ja" : {
@@ -2292,6 +2967,12 @@
             "value" : "Pronunciation: On"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pronunciación: Encendida"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2326,6 +3007,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pronunciation: On (%@)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pronunciación: Encendida (%@)"
           }
         },
         "ja" : {
@@ -2364,6 +3051,12 @@
             "value" : "Quit"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2397,6 +3090,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ready to translate"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo para traducir"
           }
         },
         "ja" : {
@@ -2434,6 +3133,12 @@
             "value" : "Refresh"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2469,6 +3174,12 @@
             "value" : "Refresh Status"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar estado"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2496,7 +3207,14 @@
       }
     },
     "Remove" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        }
+      }
     },
     "Required" : {
       "extractionState" : "stale",
@@ -2505,6 +3223,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Required"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requerido"
           }
         },
         "ja" : {
@@ -2534,7 +3258,14 @@
       }
     },
     "Retry" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reintentar"
+          }
+        }
+      }
     },
     "Right Command" : {
       "extractionState" : "stale",
@@ -2543,6 +3274,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Right Command"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comando derecho"
           }
         },
         "ja" : {
@@ -2580,6 +3317,12 @@
             "value" : "Right Control"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control derecho"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2615,6 +3358,12 @@
             "value" : "Right Option"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opción derecha"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2648,6 +3397,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Right Shift"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shift derecho"
           }
         },
         "ja" : {
@@ -2686,6 +3441,12 @@
             "value" : "Русский"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruso"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2719,6 +3480,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Same language - no translation needed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mismo idioma - no se necesita traducción"
           }
         },
         "ja" : {
@@ -2756,6 +3523,12 @@
             "value" : "Screen Recording"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grabación de pantalla"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2791,6 +3564,12 @@
             "value" : "Settings"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2824,6 +3603,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuración..."
           }
         },
         "ja" : {
@@ -2862,6 +3647,12 @@
             "value" : "Shortcut: %@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajo: %@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2895,6 +3686,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shortcuts"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajos"
           }
         },
         "ja" : {
@@ -2932,6 +3729,12 @@
             "value" : "Show capture area when shortcut is pressed"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar área de captura al pulsar el atajo"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2962,6 +3765,12 @@
       "comment" : "App name - keep in English",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SnapTra Translator"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "SnapTra Translator"
@@ -3002,6 +3811,12 @@
             "value" : "SnapTra Translator needs screen recording to detect words under the cursor."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SnapTra Translator necesita grabación de pantalla para detectar palabras bajo el cursor."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3033,6 +3848,12 @@
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Español"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Español"
@@ -3073,6 +3894,12 @@
             "value" : "Star on GitHub"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dar estrella en GitHub"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3106,6 +3933,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start automatically when you log in"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar automáticamente al iniciar sesión"
           }
         },
         "ja" : {
@@ -3143,6 +3976,12 @@
             "value" : "System built-in, works offline"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integrado en el sistema, funciona sin conexión"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3158,10 +3997,56 @@
       }
     },
     "System Dictionary" : {
-      "comment" : "System dictionary name"
+      "comment" : "System dictionary name",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Dictionary"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diccionario del sistema"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システム辞書"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템 사전"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统字典"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系統字典"
+          }
+        }
+      }
     },
     "Tech terms" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Términos técnicos"
+          }
+        }
+      }
     },
     "Thai" : {
       "comment" : "Language name - use native name",
@@ -3171,6 +4056,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ไทย"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tailandés"
           }
         },
         "ja" : {
@@ -3208,6 +4099,12 @@
             "value" : "The language pack for %1$@ → %2$@ translation is not installed. Please download the required language packs in System Settings > General > Language & Region > Translation Languages."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El paquete de idioma para la traducción %@ → %@ no está instalado. Descargue los paquetes de idioma requeridos en Configuración del sistema > General > Idioma y región > Idiomas de traducción."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3243,6 +4140,12 @@
             "value" : "Translate to"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traducir a"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3275,6 +4178,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Translating"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traduciendo"
           }
         },
         "ja" : {
@@ -3312,6 +4221,12 @@
             "value" : "Translation failed: %@"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de traducción: %@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3347,6 +4262,12 @@
             "value" : "Translation Mode"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo de traducción"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3368,6 +4289,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Translation not supported for this language pair."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La traducción no es compatible con este par de idiomas."
           }
         },
         "ja" : {
@@ -3405,6 +4332,12 @@
             "value" : "Translation requires macOS 15"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La traducción requiere macOS 15"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3440,6 +4373,12 @@
             "value" : "Translation timeout. Please try again."
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo de espera de traducción agotado. Inténtelo de nuevo."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3466,8 +4405,56 @@
         }
       }
     },
+    "Uninstall" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uninstall"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desinstalar"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アンインストール"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제거"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "卸载"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "卸載"
+          }
+        }
+      }
+    },
     "Used first for English word lookups. Translation still uses Apple Translation." : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se usa primero para búsquedas de palabras en inglés. La traducción sigue usando Traducción de Apple."
+          }
+        }
+      }
     },
     "Vietnamese" : {
       "comment" : "Language name - use native name",
@@ -3477,6 +4464,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tiếng Việt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vietnamita"
           }
         },
         "ja" : {
@@ -3514,6 +4507,12 @@
             "value" : "Website"
           }
         },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitio web"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3541,7 +4540,14 @@
       }
     },
     "Works offline" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funciona sin conexión"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -100,13 +100,13 @@ final class SettingsStore: ObservableObject {
         let sources: [DictionarySource] = [
             DictionarySource(
                 id: UUID(),
-                name: NSLocalizedString("Advanced Dictionary", comment: "ECDICT name"),
+                name: L("Advanced Dictionary"),
                 type: .ecdict,
                 isEnabled: ecdictInstalled
             ),
             DictionarySource(
                 id: UUID(),
-                name: NSLocalizedString("System Dictionary", comment: "System dictionary name"),
+                name: L("System Dictionary"),
                 type: .system,
                 isEnabled: true
             )
