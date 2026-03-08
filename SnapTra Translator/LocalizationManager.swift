@@ -31,13 +31,44 @@ final class LocalizationManager: ObservableObject {
     }
     
     private func updateBundle(for language: AppLanguage) {
-        if let identifier = language.localeIdentifier,
-           let path = Bundle.main.path(forResource: identifier, ofType: "lproj"),
+        guard let identifier = language.localeIdentifier else {
+            // "Follow System": resolve the actual system language,
+            // bypassing any app-level AppleLanguages override.
+            if let sysLang = systemLanguageIdentifier(),
+               let path = Bundle.main.path(forResource: sysLang, ofType: "lproj"),
+               let bundle = Bundle(path: path) {
+                currentBundle = bundle
+            } else if let path = Bundle.main.path(forResource: "en", ofType: "lproj"),
+                      let bundle = Bundle(path: path) {
+                currentBundle = bundle
+            } else {
+                currentBundle = .main
+            }
+            return
+        }
+
+        if let path = Bundle.main.path(forResource: identifier, ofType: "lproj"),
            let bundle = Bundle(path: path) {
             currentBundle = bundle
         } else {
             currentBundle = .main
         }
+    }
+
+    /// Returns the best matching localization for the system language,
+    /// reading from the global (non-app) AppleLanguages preference.
+    private func systemLanguageIdentifier() -> String? {
+        guard let systemLanguages = CFPreferencesCopyValue(
+            "AppleLanguages" as CFString,
+            kCFPreferencesAnyApplication,
+            kCFPreferencesCurrentUser,
+            kCFPreferencesAnyHost
+        ) as? [String] else {
+            return nil
+        }
+
+        let available = Bundle.main.localizations.filter { $0 != "Base" }
+        return Bundle.preferredLocalizations(from: available, forPreferences: systemLanguages).first
     }
     
     private func applyLanguage(_ language: AppLanguage) {
