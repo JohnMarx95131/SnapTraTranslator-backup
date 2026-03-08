@@ -35,8 +35,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D3F4D9002F14D1A2004035A9 /* SnapTra Translator */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = "SnapTra Translator";
 			sourceTree = "<group>";
 		};

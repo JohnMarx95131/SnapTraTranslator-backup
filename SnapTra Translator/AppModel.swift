@@ -125,6 +125,13 @@ final class AppModel: ObservableObject {
         self.dictionaryDownload = DictionaryDownloadManager(offlineService: dictionaryService.offlineService)
         self.wordNetDownload = WordNetDownloadManager(wordNetService: dictionaryService.wordNetService)
 
+        // Forward SettingsStore changes to AppModel so SwiftUI redraws
+        resolvedSettings.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+
         // Forward DictionaryDownloadManager changes to AppModel so SwiftUI redraws
         self.dictionaryDownload.objectWillChange
             .sink { [weak self] _ in

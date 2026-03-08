@@ -7,7 +7,125 @@
 
 import SwiftUI
 
-/// Data model for dictionary sources
+struct TTSServiceRow: View {
+    let provider: TTSProvider
+    let isSelected: Bool
+    let latency: TTSLatencyTester.LatencyResult
+    let onSelect: () -> Void
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Circle()
+                .strokeBorder(isSelected ? Color.accentColor : Color.secondary.opacity(0.5), lineWidth: 1.5)
+                .frame(width: 16, height: 16)
+                .overlay {
+                    if isSelected {
+                        Circle().fill(Color.accentColor).frame(width: 8, height: 8)
+                    }
+                }
+            
+            Image(systemName: iconName)
+                .font(.system(size: 16))
+                .foregroundStyle(iconColor)
+                .frame(width: 24)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(provider.displayName)
+                    .font(.system(size: 13, weight: .medium))
+                Text(subtitleText)
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer()
+            
+            latencyView
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onSelect()
+        }
+    }
+    
+    private var iconName: String {
+        switch provider {
+        case .apple: return "speaker.wave.2.fill"
+        case .youdao: return "globe.asia.australia.fill"
+        case .bing: return "magnifyingglass.circle.fill"
+        case .google: return "book.fill"
+        case .baidu: return "speaker.circle.fill"
+        }
+    }
+    
+    private var iconColor: Color {
+        switch provider {
+        case .apple: return .secondary
+        case .youdao: return .red
+        case .bing: return .blue
+        case .google: return .green
+        case .baidu: return .blue
+        }
+    }
+    
+    private var subtitleText: String {
+        switch provider {
+        case .apple: return L("Offline local service")
+        case .youdao: return L("No token required, supports UK/US accent")
+        case .bing: return L("Best quality, WebSocket based")
+        case .google: return L("Good quality, requires signature")
+        case .baidu: return L("No token required, supports UK/US accent")
+        }
+    }
+    
+    @ViewBuilder
+    private var latencyView: some View {
+        switch latency {
+        case .pending:
+            Text("--")
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundStyle(.tertiary)
+        case .testing:
+            ProgressView()
+                .controlSize(.small)
+                .scaleEffect(0.7)
+        case .offline:
+            Text(L("Local"))
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(Color.secondary.opacity(0.1))
+                )
+        case .success(let ms):
+            Text(formattedLatency(ms))
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundStyle(ms < 500 ? .green : (ms < 1000 ? .orange : .red))
+        case .failed:
+            Text(L("Failed"))
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.red)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(Color.red.opacity(0.1))
+                )
+        }
+    }
+    
+    private func formattedLatency(_ ms: TimeInterval) -> String {
+        if ms < 1000 {
+            return String(format: "%.0f ms", ms)
+        } else {
+            return String(format: "%.1f s", ms / 1000)
+        }
+    }
+}
+
 struct DictionarySource: Identifiable, Codable, Equatable {
     let id: UUID
     let name: String
@@ -35,10 +153,31 @@ enum DownloadState: Equatable {
 struct DictionarySettingsView: View {
     @EnvironmentObject var model: AppModel
     @State private var sources: [DictionarySource] = []
+    @StateObject private var ttsTester = TTSLatencyTester()
+    @State private var hasTestedTTS = false
 
     var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                dictionarySection
+                
+                Divider()
+                    .padding(.horizontal)
+                
+                ttsSection
+            }
+        }
+        .onAppear {
+            loadSources()
+            if !hasTestedTTS {
+                hasTestedTTS = true
+                Task { await ttsTester.testAllProviders() }
+            }
+        }
+    }
+    
+    private var dictionarySection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Header
             VStack(alignment: .leading, spacing: 4) {
                 Text(L("Dictionary Priority"))
                     .font(.headline)
@@ -49,8 +188,7 @@ struct DictionarySettingsView: View {
             .padding(.horizontal)
             .padding(.top)
 
-            // Dictionary Sources List - Using List for proper drag support on macOS
-            List {
+            VStack(spacing: 8) {
                 ForEach($sources) { $source in
                     IntegratedDictionaryRow(
                         source: $source,
@@ -65,17 +203,75 @@ struct DictionarySettingsView: View {
                         onCancel: { performCancel(for: source.type) },
                         onRetry: { performRetry(for: source.type) }
                     )
-                    .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
                 }
                 .onMove(perform: moveSource)
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
+            .padding(.horizontal)
         }
-        .onAppear {
-            loadSources()
+    }
+    
+    private var ttsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(L("Pronunciation Service"))
+                    .font(.headline)
+                Text(L("Apple is the offline local service, others require network. If a third-party service fails, it will automatically fallback to Apple local service."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.horizontal)
+
+            VStack(spacing: 6) {
+                ForEach(TTSProvider.allCases) { provider in
+                    TTSServiceRow(
+                        provider: provider,
+                        isSelected: model.settings.ttsProvider == provider,
+                        latency: ttsTester.latencies[provider] ?? .pending,
+                        onSelect: { model.settings.ttsProvider = provider }
+                    )
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color(nsColor: .controlBackgroundColor))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .strokeBorder(.quaternary, lineWidth: 0.5)
+                    )
+                }
+            }
+            .padding(.horizontal)
+
+            HStack {
+                Spacer()
+                Button {
+                    Task { await ttsTester.testAllProviders() }
+                } label: {
+                    HStack(spacing: 6) {
+                        if ttsTester.isTesting {
+                            ProgressView()
+                                .controlSize(.small)
+                                .scaleEffect(0.7)
+                        } else {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        Text(L("Refresh Latency"))
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(.quaternary)
+                )
+                .disabled(ttsTester.isTesting)
+            }
+            .padding(.horizontal)
+            .padding(.bottom)
         }
     }
 
