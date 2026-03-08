@@ -2,6 +2,7 @@ import AppKit
 import Combine
 import Foundation
 
+@MainActor
 final class SettingsStore: ObservableObject {
     @Published var playPronunciation: Bool {
         didSet { defaults.set(playPronunciation, forKey: AppSettingKey.playPronunciation) }
@@ -17,6 +18,12 @@ final class SettingsStore: ObservableObject {
     }
     @Published var targetLanguage: String {
         didSet { defaults.set(targetLanguage, forKey: AppSettingKey.targetLanguage) }
+    }
+    @Published var translationMode: TranslationMode {
+        didSet { defaults.set(translationMode.rawValue, forKey: AppSettingKey.translationMode) }
+    }
+    @Published var defaultLookupDirection: LookupDirection {
+        didSet { defaults.set(defaultLookupDirection.rawValue, forKey: AppSettingKey.defaultLookupDirection) }
     }
     @Published var debugShowOcrRegion: Bool {
         didSet { defaults.set(debugShowOcrRegion, forKey: AppSettingKey.debugShowOcrRegion) }
@@ -42,14 +49,16 @@ final class SettingsStore: ObservableObject {
     private let defaults: UserDefaults
     private static let dictionarySourcesKey = "dictionarySources"
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, loginItemStatus: Bool? = nil) {
         self.defaults = defaults
         let playPronunciationValue = defaults.object(forKey: AppSettingKey.playPronunciation) as? Bool
         let launchAtLoginValue = defaults.object(forKey: AppSettingKey.launchAtLogin) as? Bool
-        let loginStatus = LoginItemManager.isEnabled()
+        let loginStatus = loginItemStatus ?? LoginItemManager.isEnabled()
         let singleKeyValue = defaults.string(forKey: AppSettingKey.singleKey)
         let debugShowOcrRegionValue = defaults.object(forKey: AppSettingKey.debugShowOcrRegion) as? Bool
         let continuousTranslationValue = defaults.object(forKey: AppSettingKey.continuousTranslation) as? Bool
+        let translationModeValue = defaults.string(forKey: AppSettingKey.translationMode)
+        let defaultLookupDirectionValue = defaults.string(forKey: AppSettingKey.defaultLookupDirection)
 
         playPronunciation = playPronunciationValue ?? true
         launchAtLogin = launchAtLoginValue ?? loginStatus
@@ -57,6 +66,8 @@ final class SettingsStore: ObservableObject {
         sourceLanguage = defaults.string(forKey: AppSettingKey.sourceLanguage) ?? "en"
         let defaultTarget = Self.defaultTargetLanguage()
         targetLanguage = defaults.string(forKey: AppSettingKey.targetLanguage) ?? defaultTarget
+        translationMode = TranslationMode(rawValue: translationModeValue ?? TranslationMode.fixedDirection.rawValue) ?? .fixedDirection
+        defaultLookupDirection = LookupDirection(rawValue: defaultLookupDirectionValue ?? LookupDirection.englishToChinese.rawValue) ?? .englishToChinese
         debugShowOcrRegion = debugShowOcrRegionValue ?? false
         continuousTranslation = continuousTranslationValue ?? true
 
@@ -112,6 +123,61 @@ final class SettingsStore: ObservableObject {
 
     var hotkeyDisplayText: String {
         singleKey.title
+    }
+
+    var isAutoMutualTranslationEnabled: Bool {
+        translationMode == .autoMutualChineseEnglish
+    }
+
+    var autoTranslateChineseIdentifier: String {
+        if targetLanguage.hasPrefix("zh") {
+            return targetLanguage
+        }
+
+        if sourceLanguage.hasPrefix("zh") {
+            return sourceLanguage
+        }
+
+        return "zh-Hans"
+    }
+
+    var ocrRecognitionLanguageIdentifier: String {
+        if isAutoMutualTranslationEnabled {
+            return autoTranslateChineseIdentifier
+        }
+        return sourceLanguage
+    }
+
+    func resolvedLanguageIdentifiers(for direction: LookupDirection? = nil) -> (source: String, target: String) {
+        if isAutoMutualTranslationEnabled {
+            let resolvedDirection = direction ?? defaultLookupDirection
+            let chineseIdentifier = autoTranslateChineseIdentifier
+            return (
+                resolvedDirection.sourceLanguageIdentifier(chineseIdentifier: chineseIdentifier),
+                resolvedDirection.targetLanguageIdentifier(chineseIdentifier: chineseIdentifier)
+            )
+        }
+
+        return (sourceLanguage, targetLanguage)
+    }
+
+    func autoMutualLanguagePairs() -> [(source: String, target: String)] {
+        let chineseIdentifier = autoTranslateChineseIdentifier
+        return [
+            ("en", chineseIdentifier),
+            (chineseIdentifier, "en"),
+        ]
+    }
+
+    func setAutoMutualChineseIdentifier(_ identifier: String) {
+        let normalizedIdentifier = identifier.hasPrefix("zh") ? identifier : "zh-Hans"
+
+        if sourceLanguage.hasPrefix("zh") {
+            sourceLanguage = normalizedIdentifier
+            return
+        }
+
+        targetLanguage = normalizedIdentifier
     }
 
     private static func defaultTargetLanguage() -> String {

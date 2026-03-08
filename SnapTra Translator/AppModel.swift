@@ -42,6 +42,38 @@ enum OverlayState: Equatable {
     case noWord
 }
 
+private enum CachedLanguageAvailabilityStatus: String {
+    case installed
+    case supported
+    case unsupported
+
+    @available(macOS 15.0, *)
+    init(_ status: LanguageAvailability.Status) {
+        switch status {
+        case .installed:
+            self = .installed
+        case .supported:
+            self = .supported
+        case .unsupported:
+            self = .unsupported
+        @unknown default:
+            self = .unsupported
+        }
+    }
+
+    @available(macOS 15.0, *)
+    var translationStatus: LanguageAvailability.Status {
+        switch self {
+        case .installed:
+            return .installed
+        case .supported:
+            return .supported
+        case .unsupported:
+            return .unsupported
+        }
+    }
+}
+
 @MainActor
 final class AppModel: ObservableObject {
     @Published var overlayState: OverlayState = .idle
@@ -70,7 +102,8 @@ final class AppModel: ObservableObject {
     private var activeLookupID: UUID?
     private var isHotkeyActive = false
     private var lastAvailabilityKey: String?
-    private var cachedLanguageStatus: (key: String, isInstalled: Bool)?
+    private var cachedLanguageStatuses: [String: CachedLanguageAvailabilityStatus] = [:]
+    private var lastResolvedLookupDirection: LookupDirection?
     
     private var globalMouseMonitor: Any?
     private var localMouseMonitor: Any?
@@ -151,6 +184,7 @@ final class AppModel: ObservableObject {
         lookupTask?.cancel()
         lookupTask = nil
         activeLookupID = nil
+        lastResolvedLookupDirection = nil
         overlayState = .idle
         overlayWindowController.setInteractive(false)
         overlayWindowController.hide()
@@ -161,6 +195,7 @@ final class AppModel: ObservableObject {
         lookupTask?.cancel()
         lookupTask = nil
         activeLookupID = nil
+        lastResolvedLookupDirection = nil
         overlayState = .idle
         overlayWindowController.setInteractive(false)
         overlayWindowController.hide()
@@ -272,7 +307,10 @@ final class AppModel: ObservableObject {
         guard !Task.isCancelled, activeLookupID == lookupID else { return }
         let normalizedPoint = normalizedCursorPoint(mouseLocation, in: capture.region.rect)
         do {
-            let words = try await ocrService.recognizeWords(in: capture.image, language: settings.sourceLanguage)
+            let words = try await ocrService.recognizeWords(
+                in: capture.image,
+                preferredLanguages: ocrRecognitionLanguages
+            )
             guard !Task.isCancelled, activeLookupID == lookupID else { return }
             if settings.debugShowOcrRegion {
                 let wordBoxes = words.map { $0.boundingBox }
@@ -292,8 +330,14 @@ final class AppModel: ObservableObject {
             guard activeLookupID == lookupID else { return }
 
             updateOverlay(state: .loading(selected.text), anchor: mouseLocation)
-            let sourceLanguage = Locale.Language(identifier: settings.sourceLanguage)
-            let targetLanguage = Locale.Language(identifier: settings.targetLanguage)
+            let lookupConfiguration = resolveLookupConfiguration(for: selected.text)
+            let languagePair = lookupConfiguration.pair
+            if let resolvedDirection = lookupConfiguration.direction {
+                lastResolvedLookupDirection = resolvedDirection
+            }
+
+            let sourceLanguage = languagePair.sourceLanguage
+            let targetLanguage = languagePair.targetLanguage
             if settings.playPronunciation {
                 let languageCode = sourceLanguage.languageCode?.identifier
                 speechService.speak(
@@ -305,11 +349,14 @@ final class AppModel: ObservableObject {
             }
             guard !Task.isCancelled, activeLookupID == lookupID else { return }
 
-            let targetIsEnglish = targetLanguage.minimalIdentifier == "en"
-            let dictEntries = dictionaryService.lookupAll(selected.text, sources: settings.dictionarySources, preferEnglish: targetIsEnglish)
+            let dictEntries = dictionaryService.lookupAll(
+                selected.text,
+                sources: settings.dictionarySources,
+                preferEnglish: languagePair.targetIsEnglish
+            )
             let phonetic = dictEntries.first?.phonetic
 
-            if sourceLanguage.minimalIdentifier == targetLanguage.minimalIdentifier {
+            if languagePair.isSameLanguage {
                 // Same language: process definitions from all dictionaries
                 var allProcessedEntries: [DictionaryEntry] = []
                 let isEnglish = sourceLanguage.minimalIdentifier == "en"
@@ -354,32 +401,12 @@ final class AppModel: ObservableObject {
             }
 
             if #available(macOS 15.0, *) {
-                let languageKey = "\(sourceLanguage.minimalIdentifier)->\(targetLanguage.minimalIdentifier)"
-                
-                let isInstalled: Bool
-                if let cached = cachedLanguageStatus, cached.key == languageKey {
-                    isInstalled = cached.isInstalled
-                } else {
-                    let availability = LanguageAvailability()
-                    let status = await availability.status(from: sourceLanguage, to: targetLanguage)
-                    isInstalled = status == .installed
-                    cachedLanguageStatus = (languageKey, isInstalled)
-                    
-                    if !isInstalled {
-                        let message = status == .supported
-                            ? L("Language pack required. Please download in System Settings > General > Language & Region > Translation.")
-                            : L("Translation not supported for this language pair.")
-                        updateOverlay(state: .error(message), anchor: mouseLocation)
-                        return
-                    }
-                }
-                
-                guard isInstalled else {
-                    updateOverlay(state: .error(L("Language pack not installed.")), anchor: mouseLocation)
+                let status = await languageAvailabilityStatus(for: languagePair)
+                guard status == .installed else {
+                    updateOverlay(state: .error(message(for: status)), anchor: mouseLocation)
                     return
                 }
 
-                // 翻译单词
                 let translated = try await translationBridge.translate(text: selected.text, source: sourceLanguage, target: targetLanguage)
                 guard !Task.isCancelled, activeLookupID == lookupID else { return }
 
@@ -473,22 +500,16 @@ final class AppModel: ObservableObject {
             }
             .store(in: &cancellables)
 
-        settings.$sourceLanguage
-            .combineLatest(settings.$targetLanguage)
-            .sink { [weak self] _, _ in
-                guard let self = self else { return }
-                // Cancel any ongoing translation when language changes
-                self.lookupTask?.cancel()
-                self.lookupTask = nil
-                self.activeLookupID = nil
-                if self.overlayState != .idle {
-                    self.overlayState = .idle
-                }
-                Task {
-                    await self.checkLanguageAvailability()
-                }
-            }
-            .store(in: &cancellables)
+        Publishers.CombineLatest4(
+            settings.$sourceLanguage,
+            settings.$targetLanguage,
+            settings.$translationMode,
+            settings.$defaultLookupDirection
+        )
+        .sink { [weak self] _, _, _, _ in
+            self?.handleTranslationSettingsChanged()
+        }
+        .store(in: &cancellables)
 
         permissions.$status
             .sink { [weak self] status in
@@ -527,28 +548,134 @@ final class AppModel: ObservableObject {
         hotkeyManager.start(singleKey: settings.singleKey)
     }
 
+    private func handleTranslationSettingsChanged() {
+        lookupTask?.cancel()
+        lookupTask = nil
+        activeLookupID = nil
+        lastResolvedLookupDirection = nil
+        lastAvailabilityKey = nil
+        cachedLanguageStatuses.removeAll()
+        translationBridge.cancelAllPendingRequests()
+
+        if overlayState != .idle {
+            overlayState = .idle
+            overlayWindowController.hide()
+        }
+
+        Task {
+            await checkLanguageAvailability()
+        }
+    }
+
     private func checkLanguageAvailability() async {
         guard #available(macOS 15.0, *) else { return }
-        let sourceLanguage = Locale.Language(identifier: settings.sourceLanguage)
-        let targetLanguage = Locale.Language(identifier: settings.targetLanguage)
-        let availability = LanguageAvailability()
-        let status = await availability.status(from: sourceLanguage, to: targetLanguage)
-        let languageKey = "\(sourceLanguage.minimalIdentifier)->\(targetLanguage.minimalIdentifier)"
-        let key = "\(languageKey)-\(status)"
-        
-        cachedLanguageStatus = (languageKey, status == .installed)
-        
+        let pairs = requiredLanguagePairsForCurrentSettings()
+        var statusesByKey: [String: CachedLanguageAvailabilityStatus] = [:]
+
+        for pair in pairs {
+            statusesByKey[pair.key] = await languageAvailabilityStatus(for: pair, useCache: false)
+        }
+
+        let key = pairs
+            .map { pair in
+                let status = statusesByKey[pair.key] ?? .unsupported
+                return "\(pair.key)=\(status.rawValue)"
+            }
+            .joined(separator: "|")
+
         guard key != lastAvailabilityKey else { return }
         lastAvailabilityKey = key
+
+        guard let firstUnavailable = pairs.lazy.compactMap({ pair in
+            let status = statusesByKey[pair.key] ?? .unsupported
+            return status == .installed ? nil : status
+        }).first else {
+            return
+        }
+
+        sendNotification(
+            title: L("SnapTra Translator"),
+            body: message(for: firstUnavailable)
+        )
+    }
+
+    private var ocrRecognitionLanguages: [String] {
+        let identifiers: [String]
+        switch settings.translationMode {
+        case .fixedDirection:
+            identifiers = [settings.sourceLanguage, settings.targetLanguage]
+        case .autoMutualChineseEnglish:
+            identifiers = ["en", settings.autoTranslateChineseIdentifier]
+        }
+
+        var seen = Set<String>()
+        return identifiers.filter { seen.insert($0).inserted }
+    }
+
+    private func resolveLookupConfiguration(for token: String) -> ResolvedLookupConfiguration {
+        LookupConfigurationResolver.resolve(
+            token: token,
+            translationMode: settings.translationMode,
+            sourceLanguageIdentifier: settings.sourceLanguage,
+            targetLanguageIdentifier: settings.targetLanguage,
+            chineseIdentifier: settings.autoTranslateChineseIdentifier,
+            defaultDirection: settings.defaultLookupDirection,
+            lastResolvedDirection: lastResolvedLookupDirection
+        )
+    }
+
+    private func requiredLanguagePairsForCurrentSettings() -> [LookupLanguagePair] {
+        switch settings.translationMode {
+        case .fixedDirection:
+            return [
+                .fixed(
+                    sourceIdentifier: settings.sourceLanguage,
+                    targetIdentifier: settings.targetLanguage
+                )
+            ]
+        case .autoMutualChineseEnglish:
+            let chineseIdentifier = settings.autoTranslateChineseIdentifier
+            return [
+                .automatic(direction: .englishToChinese, chineseIdentifier: chineseIdentifier),
+                .automatic(direction: .chineseToEnglish, chineseIdentifier: chineseIdentifier),
+            ]
+        }
+    }
+
+    private func languageAvailabilityStatus(
+        for pair: LookupLanguagePair,
+        useCache: Bool = true
+    ) async -> CachedLanguageAvailabilityStatus {
+        if pair.isSameLanguage {
+            cachedLanguageStatuses[pair.key] = .installed
+            return .installed
+        }
+
+        if useCache, let cached = cachedLanguageStatuses[pair.key] {
+            return cached
+        }
+
+        let status: CachedLanguageAvailabilityStatus
+        if #available(macOS 15.0, *) {
+            let availability = LanguageAvailability()
+            let systemStatus = await availability.status(from: pair.sourceLanguage, to: pair.targetLanguage)
+            status = CachedLanguageAvailabilityStatus(systemStatus)
+        } else {
+            status = .unsupported
+        }
+
+        cachedLanguageStatuses[pair.key] = status
+        return status
+    }
+
+    private func message(for status: CachedLanguageAvailabilityStatus) -> String {
         switch status {
         case .installed:
-            break
+            return ""
         case .supported:
-            sendNotification(title: L("SnapTra Translator"), body: L("Language pack required. Please download in System Settings > General > Language & Region > Translation."))
+            return L("Language pack required. Please download in System Settings > General > Language & Region > Translation.")
         case .unsupported:
-            sendNotification(title: L("SnapTra Translator"), body: L("Translation not supported for this language pair."))
-        @unknown default:
-            break
+            return L("Translation not supported for this language pair.")
         }
     }
 

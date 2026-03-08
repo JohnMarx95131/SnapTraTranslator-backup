@@ -30,7 +30,8 @@ struct Snap_TranslateApp: App {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMenuDelegate {
-    private let model = AppModel()
+    private let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    private lazy var model = AppModel()
     private var cancellables = Set<AnyCancellable>()
     private var statusItem: NSStatusItem?
     private var settingsWindowController: SettingsWindowController?
@@ -47,10 +48,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     private weak var continuousTranslationMenuItem: NSMenuItem?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
+        guard !isRunningTests else { return }
         NSApp.setActivationPolicy(.accessory)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        guard !isRunningTests else { return }
         configureStatusItem()
         checkPermissionGrantRestart()
 
@@ -418,8 +421,7 @@ func createTranslationServiceWindow(model: AppModel) {
     guard TranslationServiceWindowHolder.shared.window == nil else { return }
 
     let translationView = TranslationBridgeView(
-        bridge: model.translationBridge,
-        settings: model.settings
+        bridge: model.translationBridge
     )
 
     let hostingView = NSHostingView(rootView: translationView)

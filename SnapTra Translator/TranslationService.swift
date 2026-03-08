@@ -20,27 +20,8 @@ struct TranslationRequest {
 
 @MainActor
 final class TranslationBridge: ObservableObject {
-    @Published var pendingRequest: TranslationRequest?
-
-    private var requestStream: AsyncStream<TranslationRequest>
-    private var requestContinuation: AsyncStream<TranslationRequest>.Continuation
-
-    init() {
-        var continuation: AsyncStream<TranslationRequest>.Continuation!
-        requestStream = AsyncStream { continuation = $0 }
-        requestContinuation = continuation
-    }
-
-    var requests: AsyncStream<TranslationRequest> {
-        requestStream
-    }
-
-    func resetStream() {
-        requestContinuation.finish()
-        var continuation: AsyncStream<TranslationRequest>.Continuation!
-        requestStream = AsyncStream { continuation = $0 }
-        requestContinuation = continuation
-    }
+    @Published private(set) var activeRequest: TranslationRequest?
+    private var queuedRequests: [TranslationRequest] = []
 
     func translate(text: String, source: Locale.Language?, target: Locale.Language, timeout: TimeInterval = 10.0) async throws -> String {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -53,8 +34,7 @@ final class TranslationBridge: ObservableObject {
                 try await withCheckedThrowingContinuation { continuation in
                     let request = TranslationRequest(id: UUID(), text: trimmed, source: source, target: target, continuation: continuation)
                     Task { @MainActor in
-                        self.pendingRequest = request
-                        self.requestContinuation.yield(request)
+                        self.enqueue(request)
                     }
                 }
             }
@@ -69,75 +49,88 @@ final class TranslationBridge: ObservableObject {
             return result
         }
     }
+
+    func finishActiveRequest(id: UUID, result: Result<String, Error>) {
+        guard activeRequest?.id == id else { return }
+
+        switch result {
+        case .success(let translatedText):
+            activeRequest?.continuation.resume(returning: translatedText)
+        case .failure(let error):
+            activeRequest?.continuation.resume(throwing: error)
+        }
+
+        activeRequest = nil
+        promoteNextRequestIfNeeded()
+    }
+
+    func cancelAllPendingRequests(with error: Error = CancellationError()) {
+        if let activeRequest {
+            activeRequest.continuation.resume(throwing: error)
+            self.activeRequest = nil
+        }
+
+        for request in queuedRequests {
+            request.continuation.resume(throwing: error)
+        }
+        queuedRequests.removeAll()
+    }
+
+    private func enqueue(_ request: TranslationRequest) {
+        queuedRequests.append(request)
+        promoteNextRequestIfNeeded()
+    }
+
+    private func promoteNextRequestIfNeeded() {
+        guard activeRequest == nil, !queuedRequests.isEmpty else { return }
+        activeRequest = queuedRequests.removeFirst()
+    }
 }
 
 @available(macOS 15.0, *)
 struct TranslationBridgeView: View {
     @ObservedObject var bridge: TranslationBridge
-    @ObservedObject var settings: SettingsStore
     @State private var configuration: TranslationSession.Configuration?
     @State private var configurationID = UUID()
 
-    private var sourceLocale: Locale.Language {
-        Locale.Language(identifier: settings.sourceLanguage)
-    }
-
-    private var targetLocale: Locale.Language {
-        Locale.Language(identifier: settings.targetLanguage)
-    }
-
-    init(bridge: TranslationBridge, settings: SettingsStore) {
+    init(bridge: TranslationBridge) {
         self.bridge = bridge
-        self.settings = settings
-        // Initialize configuration immediately to ensure translationTask works
-        // even when window is hidden (onAppear won't fire until window is shown)
-        _configuration = State(initialValue: TranslationSession.Configuration(
-            source: Locale.Language(identifier: settings.sourceLanguage),
-            target: Locale.Language(identifier: settings.targetLanguage)
-        ))
     }
 
     var body: some View {
         Color.clear
             .frame(width: 0, height: 0)
             .onAppear {
-                // Ensure configuration is set (defensive, should already be set in init)
-                if configuration == nil {
-                    configuration = TranslationSession.Configuration(source: sourceLocale, target: targetLocale)
-                }
+                syncConfiguration(for: bridge.activeRequest)
             }
-            .onChange(of: settings.sourceLanguage) { _, _ in
-                resetConfiguration()
-            }
-            .onChange(of: settings.targetLanguage) { _, _ in
-                resetConfiguration()
+            .onChange(of: bridge.activeRequest?.id) { _, _ in
+                syncConfiguration(for: bridge.activeRequest)
             }
             .translationTask(configuration) { session in
-                for await request in bridge.requests {
-                    do {
-                        let response = try await session.translate(request.text)
-                        request.continuation.resume(returning: response.targetText)
-                    } catch {
-                        request.continuation.resume(throwing: error)
-                    }
-                    await MainActor.run {
-                        bridge.pendingRequest = nil
-                    }
+                guard let request = bridge.activeRequest else {
+                    return
+                }
+
+                do {
+                    let response = try await session.translate(request.text)
+                    bridge.finishActiveRequest(id: request.id, result: .success(response.targetText))
+                } catch {
+                    bridge.finishActiveRequest(id: request.id, result: .failure(error))
                 }
             }
             .id(configurationID)
     }
 
-    private func resetConfiguration() {
-        // Clear pending request when language changes to avoid stuck state
-        if let pending = bridge.pendingRequest {
-            pending.continuation.resume(throwing: CancellationError())
-            bridge.pendingRequest = nil
+    private func syncConfiguration(for request: TranslationRequest?) {
+        guard let request else {
+            configuration = nil
+            return
         }
-        // Reset stream so new translationTask can receive requests
-        bridge.resetStream()
-        // Force view recreation to ensure translationTask restarts properly
-        configurationID = UUID()
-        configuration = TranslationSession.Configuration(source: sourceLocale, target: targetLocale)
+
+        configurationID = request.id
+        configuration = TranslationSession.Configuration(
+            source: request.source,
+            target: request.target
+        )
     }
 }
