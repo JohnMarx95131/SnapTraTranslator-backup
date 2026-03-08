@@ -186,9 +186,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         self.continuousTranslationMenuItem = continuousItem
 
         // Hotkey display (disabled, just shows current hotkey)
-        let hotkeyFormat = NSLocalizedString("Shortcut: %@", comment: "Hotkey display in menu")
         let hotkeyItem = NSMenuItem(
-            title: String(format: hotkeyFormat, model.settings.hotkeyDisplayText),
+            title: String(format: L("Shortcut: %@"), model.settings.hotkeyDisplayText),
             action: nil,
             keyEquivalent: ""
         )
@@ -199,7 +198,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
 
         // Settings
         let settingsItem = NSMenuItem(
-            title: NSLocalizedString("Settings...", comment: "Settings menu item"),
+            title: L("Settings..."),
             action: #selector(openSettingsWindow),
             keyEquivalent: ","
         )
@@ -210,7 +209,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
 
         // About
         let aboutItem = NSMenuItem(
-            title: NSLocalizedString("About SnapTra", comment: "About menu item"),
+            title: L("About SnapTra"),
             action: #selector(openAbout),
             keyEquivalent: ""
         )
@@ -220,7 +219,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
 
         // Quit
         let quitItem = NSMenuItem(
-            title: NSLocalizedString("Quit", comment: "Quit menu item"),
+            title: L("Quit"),
             action: #selector(quitApp),
             keyEquivalent: "q"
         )
@@ -238,17 +237,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         // Update pronunciation menu item with provider info
         let provider = model.settings.ttsProvider
         let providerName = provider == .apple
-            ? NSLocalizedString("System", comment: "System TTS provider")
+            ? L("System")
             : provider.displayName
         let pronunciationTitle = model.settings.playPronunciation
-            ? String(format: NSLocalizedString("Pronunciation: On (%@)", comment: "Pronunciation toggle on with provider"), providerName)
-            : NSLocalizedString("Pronunciation: Off", comment: "Pronunciation toggle off")
+            ? String(format: L("Pronunciation: On (%@)"), providerName)
+            : L("Pronunciation: Off")
         pronunciationMenuItem?.title = pronunciationTitle
 
         // Update continuous translation menu item
         let continuousTitle = model.settings.continuousTranslation
-            ? NSLocalizedString("Continuous Translation: On", comment: "Continuous translation toggle on")
-            : NSLocalizedString("Continuous Translation: Off", comment: "Continuous translation toggle off")
+            ? L("Continuous Translation: On")
+            : L("Continuous Translation: Off")
         continuousTranslationMenuItem?.title = continuousTitle
     }
 

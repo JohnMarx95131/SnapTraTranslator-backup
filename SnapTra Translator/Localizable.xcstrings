@@ -48,6 +48,7 @@
     },
     "About SnapTra" : {
       "comment" : "About menu item",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -158,6 +159,29 @@
         }
       }
     },
+    "App Language" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Language"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "应用语言"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "應用語言"
+          }
+        }
+      }
+    },
     "Arabic" : {
       "comment" : "Language name - use native name",
       "extractionState" : "stale",
@@ -264,6 +288,52 @@
         }
       }
     },
+    "Best quality, requires token" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best quality, requires token"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音质最佳，需要 Token"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音質最佳，需要 Token"
+          }
+        }
+      }
+    },
+    "Best quality, WebSocket based" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best quality, WebSocket based"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音质最佳，基于 WebSocket"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音質最佳，基於 WebSocket"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
         "en" : {
@@ -329,6 +399,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "擷取失敗"
+          }
+        }
+      }
+    },
+    "Change the display language of the app" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the display language of the app"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更改应用的显示语言"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更改應用的顯示語言"
           }
         }
       }
@@ -440,6 +533,29 @@
         }
       }
     },
+    "Chinese-English Auto Mutual Translation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chinese-English Auto Mutual Translation"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中英互译"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中英互譯"
+          }
+        }
+      }
+    },
     "Choose file…" : {
 
     },
@@ -515,6 +631,7 @@
     },
     "Continuous Translation: Off" : {
       "comment" : "Continuous translation toggle off",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -550,6 +667,7 @@
     },
     "Continuous Translation: On" : {
       "comment" : "Continuous translation toggle on",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -901,6 +1019,29 @@
         }
       }
     },
+    "Fixed Translation Direction" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixed Translation Direction"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定翻译方向"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定翻譯方向"
+          }
+        }
+      }
+    },
     "French" : {
       "comment" : "Language name - use native name",
       "extractionState" : "stale",
@@ -1011,6 +1152,29 @@
         }
       }
     },
+    "Good quality, requires signature" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Good quality, requires signature"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音质良好，需要签名"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音質良好，需要簽名"
+          }
+        }
+      }
+    },
     "Granted" : {
       "localizations" : {
         "en" : {
@@ -1046,6 +1210,7 @@
       }
     },
     "Hotkey" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1788,6 +1953,29 @@
         }
       }
     },
+    "No token required, supports UK/US accent" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No token required, supports UK/US accent"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无需 Token，支持英音/美音"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無需 Token，支持英音/美音"
+          }
+        }
+      }
+    },
     "No word detected" : {
       "localizations" : {
         "en" : {
@@ -2035,8 +2223,32 @@
     "Powered by ECDICT" : {
 
     },
+    "Pronunciation Service" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pronunciation Service"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发音服务"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發音服務"
+          }
+        }
+      }
+    },
     "Pronunciation: Off" : {
       "comment" : "Pronunciation toggle off",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2107,10 +2319,44 @@
       }
     },
     "Pronunciation: On (%@)" : {
-      "comment" : "Pronunciation toggle on with provider"
+      "comment" : "Pronunciation toggle on with provider",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pronunciation: On (%@)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "発音: オン (%@)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "발음: 켜짐 (%@)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发音: 开 (%@)"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發音: 開 (%@)"
+          }
+        }
+      }
     },
     "Quit" : {
       "comment" : "Quit menu item",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2572,10 +2818,43 @@
       }
     },
     "Settings..." : {
-      "comment" : "Settings menu item"
+      "comment" : "Settings menu item",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置..."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定..."
+          }
+        }
+      }
     },
     "Shortcut: %@" : {
       "comment" : "Hotkey display in menu",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2855,8 +3134,28 @@
         }
       }
     },
-    "System" : {
-      "comment" : "System TTS provider"
+    "System built-in, works offline" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System built-in, works offline"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统内置，离线可用"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系統內置，離線可用"
+          }
+        }
+      }
     },
     "System Dictionary" : {
       "comment" : "System dictionary name"
@@ -3035,6 +3334,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "翻譯失敗：%@"
+          }
+        }
+      }
+    },
+    "Translation Mode" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation Mode"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译模式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻譯模式"
           }
         }
       }

@@ -205,7 +205,7 @@ struct HotkeyKeycapSelector: View {
             HStack(spacing: 8) {
                 button(for: SingleKey.leftShift)
 
-                Text("Hotkey")
+                Text(L("Hotkey"))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.primary)
                     .frame(maxWidth: .infinity)
