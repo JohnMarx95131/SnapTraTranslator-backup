@@ -1,6 +1,6 @@
 import AVFoundation
+import CryptoKit
 import Foundation
-import Network
 import os.log
 
 @MainActor
@@ -378,61 +378,66 @@ final class BaiduTTSService {
 
 // MARK: - Edge TTS Service
 //
-// Uses NWConnection with raw TLS (no WebSocket protocol layer) so that system
-// proxies handle the connection as ordinary HTTPS via CONNECT tunnel.
-// The WebSocket upgrade and framing are implemented manually inside the
-// encrypted tunnel, giving full control over HTTP headers (Origin, User-Agent)
-// that Microsoft requires while remaining invisible to the proxy.
+// Uses URLSession.webSocketTask (same networking stack as Google TTS) with
+// Sec-MS-GEC DRM token authentication.  URLSession handles system proxies
+// correctly, unlike NWConnection which caused POSIX 53 errors through
+// Clash/V2Ray.
 
 final class EdgeTTSService {
     private let logger = Logger(subsystem: "com.yelog.SnapTra-Translator", category: "EdgeTTS")
-    private let trustedClientToken = "6A5AA1D4EAFF4E9FB37E23D68491D6F4"
-    private let queue = DispatchQueue(label: "com.yelog.SnapTra-Translator.edge-tts")
 
-    /// Scratch buffer for TCP stream → WebSocket frame reassembly.
-    private var rxBuffer = Data()
+    private let trustedClientToken = "6A5AA1D4EAFF4E9FB37E23D68491D6F4"
+    private let chromiumFullVersion = "143.0.3650.75"
+    private let secMsGecVersion = "1-143.0.3650.75"
+    private let userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        + " (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"
 
     func fetchAudio(text: String, language: String?) async throws -> Data {
-        logger.info("🌐 Starting Edge TTS (raw TLS + manual WS)...")
-        rxBuffer = Data()
+        logger.info("🌐 Starting Edge TTS (URLSession WebSocket)...")
 
         let connectionId = UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
-        let path = "/consumer/speech/synthesize/readaloud/edge/v1"
-            + "?TrustedClientToken=\(trustedClientToken)"
-            + "&Retry-After=3600"
-            + "&ConnectionId=\(connectionId)"
+        let secMsGec = generateSecMsGec()
+        let muid = generateMUID()
 
-        // Raw TLS — no NWProtocolWebSocket.  Proxies handle this as regular
-        // HTTPS via CONNECT tunnel; the WebSocket upgrade happens inside the
-        // encrypted tunnel where the proxy cannot see or interfere.
-        let connection = NWConnection(
-            host: "speech.platform.bing.com",
-            port: 443,
-            using: .tls
-        )
+        let urlString = "wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1"
+            + "?TrustedClientToken=\(trustedClientToken)"
+            + "&ConnectionId=\(connectionId)"
+            + "&Sec-MS-GEC=\(secMsGec)"
+            + "&Sec-MS-GEC-Version=\(secMsGecVersion)"
+
+        guard let url = URL(string: urlString) else {
+            throw TTSError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue("chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold", forHTTPHeaderField: "Origin")
+        request.setValue("no-cache", forHTTPHeaderField: "Pragma")
+        request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        request.setValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
+        request.setValue(connectionId, forHTTPHeaderField: "X-ConnectionId")
+        request.setValue("MUID=\(muid)", forHTTPHeaderField: "Cookie")
+
+        let task = URLSession.shared.webSocketTask(with: request)
+        task.resume()
 
         return try await withThrowingTaskGroup(of: Data.self) { group in
             group.addTask {
-                defer { connection.cancel() }
+                defer { task.cancel(with: .goingAway, reason: nil) }
 
-                try await self.waitForReady(connection)
-                self.logger.debug("✅ TLS connected")
-
-                try await self.performWebSocketHandshake(
-                    connection, path: path, connectionId: connectionId
-                )
-                self.logger.debug("✅ WebSocket upgraded")
-
-                try await self.sendTextFrame(connection, self.createConfigMessage())
+                // Send config
+                try await task.send(.string(self.createConfigMessage()))
                 self.logger.debug("📤 Config sent")
 
+                // Send SSML
                 let voiceName = self.getVoiceName(language: language)
                 let ssml = self.generateSSML(text: text, voiceName: voiceName)
-                try await self.sendTextFrame(connection, self.createSSMLMessage(ssml: ssml))
+                try await task.send(.string(self.createSSMLMessage(ssml: ssml)))
                 self.logger.debug("📤 SSML sent")
 
+                // Receive audio
                 self.logger.info("⏳ Receiving audio frames...")
-                return try await self.receiveAudio(connection)
+                return try await self.receiveAudio(task)
             }
 
             group.addTask {
@@ -449,193 +454,36 @@ final class EdgeTTSService {
         }
     }
 
-    // MARK: - Connection Lifecycle
+    // MARK: - Sec-MS-GEC Token
 
-    private func waitForReady(_ conn: NWConnection) async throws {
-        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-            conn.stateUpdateHandler = { [weak self] state in
-                switch state {
-                case .ready:
-                    conn.stateUpdateHandler = nil
-                    cont.resume()
-                case .failed(let error):
-                    self?.logger.error("❌ Connection failed: \(error)")
-                    conn.stateUpdateHandler = nil
-                    cont.resume(throwing: error)
-                case .waiting(let error):
-                    self?.logger.error("❌ Connection waiting: \(error)")
-                    conn.stateUpdateHandler = nil
-                    cont.resume(throwing: error)
-                case .cancelled:
-                    conn.stateUpdateHandler = nil
-                    cont.resume(throwing: CancellationError())
-                default:
-                    break
-                }
-            }
-            conn.start(queue: self.queue)
-        }
+    /// Generate Sec-MS-GEC DRM token (SHA-256 of Windows epoch ticks + client token).
+    private func generateSecMsGec() -> String {
+        let unixTime = Int64(Date().timeIntervalSince1970)
+        let windowsEpochOffset: Int64 = 11644473600
+        let roundedSeconds = ((unixTime + windowsEpochOffset) / 300) * 300
+        let ticks = roundedSeconds * 10_000_000
+        let input = "\(ticks)\(trustedClientToken)"
+        let hash = SHA256.hash(data: Data(input.utf8))
+        return hash.map { String(format: "%02X", $0) }.joined()
     }
 
-    // MARK: - Manual WebSocket Handshake
-
-    private func performWebSocketHandshake(
-        _ conn: NWConnection,
-        path: String,
-        connectionId: String
-    ) async throws {
-        let wsKey = generateWebSocketKey()
-        let upgrade = "GET \(path) HTTP/1.1\r\n"
-            + "Host: speech.platform.bing.com\r\n"
-            + "Upgrade: websocket\r\n"
-            + "Connection: Upgrade\r\n"
-            + "Sec-WebSocket-Key: \(wsKey)\r\n"
-            + "Sec-WebSocket-Version: 13\r\n"
-            + "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            + " (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0\r\n"
-            + "Origin: chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold\r\n"
-            + "Pragma: no-cache\r\n"
-            + "Cache-Control: no-cache\r\n"
-            + "Accept-Language: en-US,en;q=0.9\r\n"
-            + "X-ConnectionId: \(connectionId)\r\n"
-            + "\r\n"
-
-        try await sendRaw(conn, upgrade.data(using: .utf8)!)
-
-        // Read until end of HTTP headers
-        let terminator = Data([0x0D, 0x0A, 0x0D, 0x0A])
-        while rxBuffer.range(of: terminator) == nil {
-            let chunk = try await recvRaw(conn, max: 4096)
-            rxBuffer.append(chunk)
-            guard rxBuffer.count < 16384 else {
-                throw TTSError.webSocketError("Handshake response too large")
-            }
-        }
-
-        let range = rxBuffer.range(of: terminator)!
-        let headersData = rxBuffer[..<range.upperBound]
-        rxBuffer.removeSubrange(..<range.upperBound)
-
-        let headers = String(data: headersData, encoding: .utf8) ?? ""
-        logger.debug("📨 Upgrade response: \(headers.prefix(200))")
-
-        guard headers.contains("101") else {
-            throw TTSError.webSocketError("WebSocket upgrade rejected: \(headers.prefix(120))")
-        }
-    }
-
-    private func generateWebSocketKey() -> String {
-        Data((0..<16).map { _ in UInt8.random(in: 0...255) }).base64EncodedString()
-    }
-
-    // MARK: - Raw I/O
-
-    private func sendRaw(_ conn: NWConnection, _ data: Data) async throws {
-        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
-            conn.send(content: data, completion: .contentProcessed { error in
-                if let error { cont.resume(throwing: error) } else { cont.resume() }
-            })
-        }
-    }
-
-    private func recvRaw(_ conn: NWConnection, max: Int) async throws -> Data {
-        try await withCheckedThrowingContinuation { cont in
-            conn.receive(minimumIncompleteLength: 1, maximumLength: max) { data, _, _, error in
-                if let error { cont.resume(throwing: error); return }
-                guard let data, !data.isEmpty else {
-                    cont.resume(throwing: TTSError.webSocketError("Connection closed"))
-                    return
-                }
-                cont.resume(returning: data)
-            }
-        }
-    }
-
-    /// Read exactly `n` bytes, pulling from rxBuffer first.
-    private func readExact(_ conn: NWConnection, _ n: Int) async throws -> Data {
-        while rxBuffer.count < n {
-            let chunk = try await recvRaw(conn, max: max(n - rxBuffer.count, 4096))
-            rxBuffer.append(chunk)
-        }
-        let result = Data(rxBuffer.prefix(n))
-        rxBuffer.removeFirst(n)
-        return result
-    }
-
-    // MARK: - WebSocket Framing (RFC 6455)
-
-    /// Build a masked client→server WebSocket frame.
-    private func buildFrame(opcode: UInt8, payload: Data) -> Data {
-        var f = Data()
-        f.append(0x80 | opcode)
-
-        let len = payload.count
-        if len < 126 {
-            f.append(UInt8(len) | 0x80)
-        } else if len < 65536 {
-            f.append(126 | 0x80)
-            f.append(UInt8((len >> 8) & 0xFF))
-            f.append(UInt8(len & 0xFF))
-        } else {
-            f.append(127 | 0x80)
-            for i in (0..<8).reversed() { f.append(UInt8((len >> (i * 8)) & 0xFF)) }
-        }
-
-        let mask: [UInt8] = (0..<4).map { _ in UInt8.random(in: 0...255) }
-        f.append(contentsOf: mask)
-        for (i, b) in payload.enumerated() { f.append(b ^ mask[i % 4]) }
-        return f
-    }
-
-    private func sendTextFrame(_ conn: NWConnection, _ text: String) async throws {
-        try await sendRaw(conn, buildFrame(opcode: 0x01, payload: text.data(using: .utf8)!))
-    }
-
-    /// Read one WebSocket frame → (opcode, payload). Auto-replies to pings.
-    private func readFrame(_ conn: NWConnection) async throws -> (UInt8, Data) {
-        let hdr = try await readExact(conn, 2)
-        let opcode = hdr[0] & 0x0F
-        let masked = (hdr[1] & 0x80) != 0
-        var len = UInt64(hdr[1] & 0x7F)
-
-        if len == 126 {
-            let ext = try await readExact(conn, 2)
-            len = UInt64(ext[0]) << 8 | UInt64(ext[1])
-        } else if len == 127 {
-            let ext = try await readExact(conn, 8)
-            len = 0; for b in ext { len = len << 8 | UInt64(b) }
-        }
-        guard len < 20_000_000 else {
-            throw TTSError.webSocketError("Frame too large: \(len)")
-        }
-
-        var maskKey: [UInt8]?
-        if masked { maskKey = Array(try await readExact(conn, 4)) }
-
-        var payload = len > 0 ? try await readExact(conn, Int(len)) : Data()
-        if let key = maskKey {
-            for i in 0..<payload.count { payload[i] ^= key[i % 4] }
-        }
-
-        if opcode == 0x09 { // Ping → Pong
-            try await sendRaw(conn, buildFrame(opcode: 0x0A, payload: payload))
-            return try await readFrame(conn)
-        }
-        return (opcode, payload)
+    /// Generate random 32-char uppercase hex MUID cookie value.
+    private func generateMUID() -> String {
+        (0..<16).map { _ in String(format: "%02X", UInt8.random(in: 0...255)) }.joined()
     }
 
     // MARK: - Audio Reception
 
-    private func receiveAudio(_ conn: NWConnection) async throws -> Data {
+    private func receiveAudio(_ task: URLSessionWebSocketTask) async throws -> Data {
         var audioData = Data()
         var msgCount = 0
 
         receiveLoop: while true {
-            let (opcode, payload) = try await readFrame(conn)
+            let message = try await task.receive()
             msgCount += 1
 
-            switch opcode {
-            case 0x02: // binary
+            switch message {
+            case .data(let payload):
                 guard payload.count >= 2 else { continue receiveLoop }
                 let hdrLen = (Int(payload[0]) << 8) | Int(payload[1])
                 let hdrEnd = 2 + hdrLen
@@ -656,19 +504,14 @@ final class EdgeTTSService {
                     break receiveLoop
                 }
 
-            case 0x01: // text
-                let text = String(data: payload, encoding: .utf8) ?? ""
+            case .string(let text):
                 logger.debug("📨 text \(msgCount): \(text.prefix(80))")
                 if text.contains("Path:turn.end") {
                     logger.info("✅ turn.end (text) after \(msgCount) msgs")
                     break receiveLoop
                 }
 
-            case 0x08: // close
-                logger.info("🔒 Server close frame")
-                break receiveLoop
-
-            default:
+            @unknown default:
                 break
             }
         }
