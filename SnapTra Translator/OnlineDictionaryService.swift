@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import os.log
+import WebKit
 
 final class OnlineDictionaryService {
     private let session: URLSession
@@ -86,44 +87,17 @@ final class OnlineDictionaryService {
         sourceLanguage: String,
         targetLanguage: String
     ) async throws -> DictionaryEntry? {
-        guard let target = deepLLanguageCode(for: targetLanguage) else { return nil }
+        guard let source = deepLPageLanguageCode(for: sourceLanguage),
+              let target = deepLPageLanguageCode(for: targetLanguage) else {
+            return nil
+        }
 
-        let requestID = Int.random(in: 100_000...189_998) * 1000
-        let timestamp = deepLTimestamp(for: word)
-        let payload = DeepLRequest(
-            jsonrpc: "2.0",
-            method: "LMT_handle_texts",
-            id: requestID,
-            params: .init(
-                texts: [.init(text: word, requestAlternatives: 3)],
-                splitting: "newlines",
-                lang: .init(
-                    sourceLangUserSelected: deepLLanguageCode(for: sourceLanguage) ?? "auto",
-                    targetLang: target
-                ),
-                timestamp: timestamp,
-                commonJobParams: .init(
-                    regionalVariant: deepLRegionalVariant(for: targetLanguage),
-                    mode: "translate",
-                    browserType: 1,
-                    textType: "plaintext"
-                )
-            )
+        let translations = try await DeepLWebViewTranslator.lookup(
+            word: word,
+            sourceLanguage: source,
+            targetLanguage: target,
+            userAgent: Self.userAgent
         )
-
-        var request = URLRequest(url: URL(string: "https://www2.deepl.com/jsonrpc")!)
-        request.httpMethod = "POST"
-        request.httpBody = try JSONEncoder().encode(payload)
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(Self.userAgent, forHTTPHeaderField: "User-Agent")
-
-        let data = try await performRequest(request)
-        let response = try JSONDecoder().decode(DeepLResponse.self, from: data)
-        guard let result = response.result?.texts.first else { return nil }
-
-        var translations = [result.text]
-        translations.append(contentsOf: result.alternatives?.map(\.text) ?? [])
-        translations = uniqueStrings(translations)
 
         guard !translations.isEmpty else { return nil }
         return makeTranslationEntry(
@@ -629,6 +603,25 @@ final class OnlineDictionaryService {
         }
     }
 
+    private func deepLPageLanguageCode(for language: String) -> String? {
+        switch language {
+        case "auto", "und":
+            return "auto"
+        case "zh":
+            return "zh"
+        case "zh-Hans":
+            return "zh-Hans"
+        case "zh-Hant":
+            return "zh-Hant"
+        case "pt-BR":
+            return "pt-BR"
+        case "pt-PT", "pt":
+            return "pt-PT"
+        default:
+            return localeLanguageIdentifier(for: language)
+        }
+    }
+
     private func deepLLanguageCode(for language: String) -> String? {
         switch language {
         case "zh", "zh-Hans", "zh-Hant":
@@ -856,6 +849,205 @@ private struct DeepLResponse: Decodable {
     struct Alternative: Decodable {
         let text: String
     }
+}
+
+@MainActor
+private final class DeepLWebViewTranslator: NSObject, WKNavigationDelegate {
+    private let webView: WKWebView
+    private let sourceLanguage: String
+    private let targetLanguage: String
+    private let word: String
+    private var navigationContinuation: CheckedContinuation<Void, Error>?
+
+    private init(
+        word: String,
+        sourceLanguage: String,
+        targetLanguage: String,
+        userAgent: String
+    ) {
+        self.word = word
+        self.sourceLanguage = sourceLanguage
+        self.targetLanguage = targetLanguage
+
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+
+        webView = WKWebView(frame: .zero, configuration: configuration)
+        webView.customUserAgent = userAgent
+
+        super.init()
+        webView.navigationDelegate = self
+    }
+
+    static func lookup(
+        word: String,
+        sourceLanguage: String,
+        targetLanguage: String,
+        userAgent: String
+    ) async throws -> [String] {
+        let translator = DeepLWebViewTranslator(
+            word: word,
+            sourceLanguage: sourceLanguage,
+            targetLanguage: targetLanguage,
+            userAgent: userAgent
+        )
+        return try await translator.performLookup()
+    }
+
+    private func performLookup() async throws -> [String] {
+        guard let url = makeTranslationURL() else {
+            throw OnlineDictionaryError.invalidRequest
+        }
+
+        webView.load(URLRequest(url: url))
+        try await waitForNavigation()
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        try await injectSourceText()
+
+        let deadline = Date().addingTimeInterval(12)
+        while Date() < deadline {
+            let state = try await readPageState()
+            if state.source == word, !state.target.isEmpty {
+                return [state.target]
+            }
+            try await Task.sleep(nanoseconds: 350_000_000)
+        }
+
+        return []
+    }
+
+    private func makeTranslationURL() -> URL? {
+        guard let encodedWord = word.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
+            return nil
+        }
+
+        return URL(
+            string: "https://www.deepl.com/en/translator#\(sourceLanguage)/\(targetLanguage)/\(encodedWord)"
+        )
+    }
+
+    private func waitForNavigation() async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            navigationContinuation = continuation
+        }
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        navigationContinuation?.resume()
+        navigationContinuation = nil
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        navigationContinuation?.resume(throwing: error)
+        navigationContinuation = nil
+    }
+
+    func webView(
+        _ webView: WKWebView,
+        didFailProvisionalNavigation navigation: WKNavigation!,
+        withError error: Error
+    ) {
+        navigationContinuation?.resume(throwing: error)
+        navigationContinuation = nil
+    }
+
+    private func injectSourceText() async throws {
+        let script = """
+        (() => {
+          const textboxes = Array.from(document.querySelectorAll('[role="textbox"][data-content="true"]'));
+          const source = textboxes.find((element) => {
+            const label = element.getAttribute('aria-labelledby') || '';
+            return label.includes('source');
+          }) || textboxes.find((element) => element.getAttribute('contenteditable') === 'true');
+
+          if (!source) {
+            return JSON.stringify({ ok: false, reason: 'missing-source' });
+          }
+
+          const text = \(javaScriptLiteral(word));
+          source.focus();
+          source.textContent = text;
+
+          source.dispatchEvent(new InputEvent('beforeinput', {
+            bubbles: true,
+            cancelable: true,
+            inputType: 'insertText',
+            data: text
+          }));
+          source.dispatchEvent(new InputEvent('input', {
+            bubbles: true,
+            inputType: 'insertText',
+            data: text
+          }));
+          source.dispatchEvent(new Event('change', { bubbles: true }));
+
+          return JSON.stringify({
+            ok: true,
+            text: (source.innerText || source.textContent || '').trim()
+          });
+        })();
+        """
+
+        guard let payload = try await webView.evaluateJavaScript(script) as? String,
+              let data = payload.data(using: .utf8) else {
+            throw OnlineDictionaryError.invalidResponse
+        }
+
+        let result = try JSONDecoder().decode(DeepLInjectionResult.self, from: data)
+        guard result.ok else {
+            throw OnlineDictionaryError.invalidResponse
+        }
+    }
+
+    private func readPageState() async throws -> DeepLPageState {
+        let script = """
+        (() => {
+          const textboxes = Array.from(document.querySelectorAll('[role="textbox"][data-content="true"]'));
+          const source = textboxes.find((element) => {
+            const label = element.getAttribute('aria-labelledby') || '';
+            return label.includes('source');
+          }) || textboxes.find((element) => element.getAttribute('contenteditable') === 'true');
+          const target = textboxes.find((element) => {
+            const label = element.getAttribute('aria-labelledby') || '';
+            return label.includes('target');
+          }) || textboxes.find((element) => element !== source);
+
+          const normalize = (element) => {
+            if (!element) { return ''; }
+            return (element.innerText || element.textContent || element.value || '')
+              .replace(/\\u00a0/g, ' ')
+              .trim();
+          };
+
+          return JSON.stringify({
+            source: normalize(source),
+            target: normalize(target)
+          });
+        })();
+        """
+
+        guard let payload = try await webView.evaluateJavaScript(script) as? String,
+              let data = payload.data(using: .utf8) else {
+            throw OnlineDictionaryError.invalidResponse
+        }
+
+        return try JSONDecoder().decode(DeepLPageState.self, from: data)
+    }
+
+    private func javaScriptLiteral(_ value: String) -> String {
+        let data = try? JSONEncoder().encode(value)
+        return String(data: data ?? Data("null".utf8), encoding: .utf8) ?? "null"
+    }
+}
+
+private struct DeepLPageState: Decodable {
+    let source: String
+    let target: String
+}
+
+private struct DeepLInjectionResult: Decodable {
+    let ok: Bool
 }
 
 private extension Array {
