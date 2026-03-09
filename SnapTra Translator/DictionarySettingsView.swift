@@ -258,8 +258,8 @@ struct DictionarySettingsView: View {
             }
             .padding(.horizontal)
 
-            // English Accent Selection (only for third-party services)
-            if model.settings.ttsProvider != .apple {
+            // English Accent Selection (only for services that support it)
+            if model.settings.ttsProvider != .apple && model.settings.ttsProvider != .google {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text(L("English Accent"))
