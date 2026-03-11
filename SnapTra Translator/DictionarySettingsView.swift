@@ -669,6 +669,7 @@ struct IntegratedDictionaryRow: View {
                     Text("\(Int(progress * 100))%")
                         .font(.system(size: 11, design: .monospaced))
                         .foregroundStyle(.secondary)
+                        .frame(width: 32, alignment: .leading)
                 }
 
             case .installing:
