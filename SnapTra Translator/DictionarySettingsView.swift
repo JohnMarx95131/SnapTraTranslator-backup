@@ -224,7 +224,9 @@ struct DictionarySettingsView: View {
     @EnvironmentObject var model: AppModel
     @State private var sources: [DictionarySource] = []
     @StateObject private var ttsTester = TTSLatencyTester()
+    @StateObject private var dictionaryTester = DictionaryLatencyTester()
     @State private var hasTestedTTS = false
+    @State private var hasTestedDictionaries = false
     var hidesScrollIndicator: Bool = false
 
     var body: some View {
@@ -249,6 +251,10 @@ struct DictionarySettingsView: View {
                 hasTestedTTS = true
                 Task { await ttsTester.testAllProviders() }
             }
+            if !hasTestedDictionaries {
+                hasTestedDictionaries = true
+                Task { await dictionaryTester.testAll() }
+            }
         }
     }
     
@@ -269,6 +275,7 @@ struct DictionarySettingsView: View {
                     IntegratedDictionaryRow(
                         source: $source,
                         downloadState: downloadState(for: source.type),
+                        latency: dictionaryTester.latencies[source.type] ?? (source.type.isOnline ? .pending : .local),
                         onToggle: { updateSources() },
                         onDownloadComplete: { handleDownloadComplete(for: source.type) },
                         onDelete: {
@@ -288,6 +295,38 @@ struct DictionarySettingsView: View {
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .padding(.horizontal)
+
+            // Refresh latency button (only show if there are online sources)
+            HStack {
+                Spacer()
+                Button {
+                    Task { await dictionaryTester.testAll() }
+                } label: {
+                    HStack(spacing: 6) {
+                        if dictionaryTester.isTesting {
+                            ProgressView()
+                                .controlSize(.small)
+                                .scaleEffect(0.7)
+                        } else {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        Text(L("Refresh Latency"))
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(.quaternary)
+                )
+                .disabled(dictionaryTester.isTesting)
+            }
+            .padding(.horizontal)
+            .padding(.bottom)
         }
     }
     
@@ -525,6 +564,7 @@ extension NSView {
 struct IntegratedDictionaryRow: View {
     @Binding var source: DictionarySource
     var downloadState: DownloadState?
+    var latency: DictionaryLatencyTester.LatencyResult
     var onToggle: () -> Void
     var onDownloadComplete: () -> Void
     var onDelete: () -> Void
@@ -558,6 +598,11 @@ struct IntegratedDictionaryRow: View {
                 }
 
                 Spacer()
+
+                // Latency indicator (for online sources)
+                if source.type.isOnline {
+                    latencyView
+                }
 
                 // Toggle
                 Toggle("", isOn: $source.isEnabled)
@@ -635,6 +680,62 @@ struct IntegratedDictionaryRow: View {
             Image(systemName: "diamond.fill")
                 .font(.system(size: 15))
                 .foregroundStyle(Color(red: 0.05, green: 0.24, blue: 0.63))
+        }
+    }
+
+    @ViewBuilder
+    private var latencyView: some View {
+        switch latency {
+        case .pending:
+            Text("--")
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundStyle(.tertiary)
+                .frame(width: 60, alignment: .trailing)
+        case .testing:
+            HStack(spacing: 4) {
+                ProgressView()
+                    .controlSize(.small)
+                    .scaleEffect(0.7)
+                Text(L("Testing"))
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+            }
+            .frame(width: 60)
+        case .local:
+            Text(L("Local"))
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(Color.secondary.opacity(0.1))
+                )
+                .frame(width: 60)
+        case .success(let ms):
+            Text(formattedLatency(ms))
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundStyle(ms < 500 ? .green : (ms < 1000 ? .orange : .red))
+                .frame(width: 60, alignment: .trailing)
+        case .failed:
+            Text(L("Failed"))
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.red)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(Color.red.opacity(0.1))
+                )
+                .frame(width: 60)
+        }
+    }
+
+    private func formattedLatency(_ ms: TimeInterval) -> String {
+        if ms < 1000 {
+            return String(format: "%.0f ms", ms)
+        } else {
+            return String(format: "%.1f s", ms / 1000)
         }
     }
 
