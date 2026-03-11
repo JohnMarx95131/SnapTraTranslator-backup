@@ -136,51 +136,76 @@ final class OCRService {
     }
 
     nonisolated static func groupParagraphs(from lines: [RecognizedTextLine]) -> [RecognizedParagraph] {
-        let sortedLines = lines.sorted { lhs, rhs in
-            if abs(lhs.boundingBox.midY - rhs.boundingBox.midY) > 0.01 {
-                return lhs.boundingBox.midY > rhs.boundingBox.midY
+        // Step 1: Cluster lines into columns by their left-edge (minX).
+        //
+        // Multi-column pages (e.g. Twitter) interleave lines from different columns
+        // when sorted purely by Y. By grouping lines with similar minX into the same
+        // column first, we guarantee that paragraph-merging only considers lines that
+        // actually share a horizontal lane — preventing right-sidebar lines from
+        // breaking a centre-column paragraph mid-flow.
+        //
+        // Column tolerance: lines whose minX differs by less than `columnTolerance`
+        // belong to the same column. We use 0.08 (8 % of normalised width) which is
+        // wide enough to tolerate a small paragraph indent but narrow enough to
+        // separate a typical three-column web layout.
+        let columnTolerance: CGFloat = 0.08
+
+        var columnBuckets: [(representativeX: CGFloat, lines: [RecognizedTextLine])] = []
+
+        for line in lines {
+            guard containsLikelyParagraphContent(line.text) else { continue }
+
+            let x = line.boundingBox.minX
+            if let idx = columnBuckets.firstIndex(where: { abs($0.representativeX - x) <= columnTolerance }) {
+                columnBuckets[idx].lines.append(line)
+            } else {
+                columnBuckets.append((representativeX: x, lines: [line]))
             }
-            return lhs.boundingBox.minX < rhs.boundingBox.minX
         }
 
-        var grouped: [[RecognizedTextLine]] = []
+        // Step 2: Within each column, sort lines top-to-bottom and merge into paragraphs.
+        var allParagraphs: [RecognizedParagraph] = []
 
-        for line in sortedLines {
-            guard containsLikelyParagraphContent(line.text) else {
-                continue
+        for bucket in columnBuckets {
+            let sortedLines = bucket.lines.sorted { lhs, rhs in
+                // Primary: top-to-bottom (higher midY = higher on screen in Vision coords)
+                if abs(lhs.boundingBox.midY - rhs.boundingBox.midY) > 0.005 {
+                    return lhs.boundingBox.midY > rhs.boundingBox.midY
+                }
+                return lhs.boundingBox.minX < rhs.boundingBox.minX
             }
 
-            if var lastGroup = grouped.last,
-               let lastLine = lastGroup.last {
-                let shouldJoin = shouldJoinParagraph(previous: lastLine, next: line)
-                if shouldJoin {
-                    lastGroup.append(line)
-                    grouped[grouped.count - 1] = lastGroup
+            var grouped: [[RecognizedTextLine]] = []
+
+            for line in sortedLines {
+                if var lastGroup = grouped.last,
+                   let lastLine = lastGroup.last {
+                    if shouldJoinParagraph(previous: lastLine, next: line) {
+                        lastGroup.append(line)
+                        grouped[grouped.count - 1] = lastGroup
+                    } else {
+                        grouped.append([line])
+                    }
                 } else {
                     grouped.append([line])
                 }
-            } else {
-                grouped.append([line])
             }
+
+            let paragraphs: [RecognizedParagraph] = grouped.compactMap { groupLines in
+                guard let firstLine = groupLines.first else { return nil }
+                let text = normalizedParagraphText(from: groupLines)
+                guard isLikelyEnglishParagraph(text) else { return nil }
+
+                let boundingBox = groupLines.dropFirst().reduce(firstLine.boundingBox) { acc, l in
+                    acc.union(l.boundingBox)
+                }
+                return RecognizedParagraph(text: text, lines: groupLines, boundingBox: boundingBox)
+            }
+
+            allParagraphs.append(contentsOf: paragraphs)
         }
 
-        return grouped.compactMap { lines in
-            guard let firstLine = lines.first else { return nil }
-            let text = normalizedParagraphText(from: lines)
-            guard isLikelyEnglishParagraph(text) else {
-                return nil
-            }
-
-            let boundingBox = lines.dropFirst().reduce(firstLine.boundingBox) { partialResult, line in
-                partialResult.union(line.boundingBox)
-            }
-
-            return RecognizedParagraph(
-                text: text,
-                lines: lines,
-                boundingBox: boundingBox
-            )
-        }
+        return allParagraphs
     }
 
     nonisolated static func selectParagraph(
