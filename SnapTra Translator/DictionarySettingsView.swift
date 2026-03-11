@@ -270,30 +270,22 @@ struct DictionarySettingsView: View {
             .padding(.horizontal)
             .padding(.top)
 
-            List {
-                ForEach($sources) { $source in
-                    IntegratedDictionaryRow(
-                        source: $source,
-                        downloadState: downloadState(for: source.type),
-                        latency: dictionaryTester.latencies[source.type] ?? (source.type.isOnline ? .pending : .local),
-                        onToggle: { updateSources() },
-                        onDownloadComplete: { handleDownloadComplete(for: source.type) },
-                        onDelete: {
-                            performDelete(for: source.type)
-                            handleDelete(for: source.type)
-                        },
-                        onDownload: { performDownload(for: source.type) },
-                        onCancel: { performCancel(for: source.type) },
-                        onRetry: { performRetry(for: source.type) }
-                    )
-                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-                }
-                .onMove(perform: moveSource)
-            }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
+            ReorderableVStack(items: $sources, content: { source, index in
+                IntegratedDictionaryRow(
+                    source: source,
+                    downloadState: downloadState(for: source.wrappedValue.type),
+                    latency: dictionaryTester.latencies[source.wrappedValue.type] ?? (source.wrappedValue.type.isOnline ? .pending : .local),
+                    onToggle: { updateSources() },
+                    onDownloadComplete: { handleDownloadComplete(for: source.wrappedValue.type) },
+                    onDelete: {
+                        performDelete(for: source.wrappedValue.type)
+                        handleDelete(for: source.wrappedValue.type)
+                    },
+                    onDownload: { performDownload(for: source.wrappedValue.type) },
+                    onCancel: { performCancel(for: source.wrappedValue.type) },
+                    onRetry: { performRetry(for: source.wrappedValue.type) }
+                )
+            }, onMove: moveSource)
             .padding(.horizontal)
 
             // Refresh latency button (only show if there are online sources)
@@ -522,6 +514,61 @@ struct DictionarySettingsView: View {
     }
 }
 
+// MARK: - Reorderable VStack
+
+struct ReorderableVStack<Content: View, Item: Identifiable>: View {
+    @Binding var items: [Item]
+    @ViewBuilder let content: (Binding<Item>, Int) -> Content
+    let onMove: (IndexSet, Int) -> Void
+    @State private var draggingItem: Item?
+    @State private var dragOffset: CGSize = .zero
+    @State private var draggedIndex: Int?
+
+    var body: some View {
+        VStack(spacing: 8) {
+            ForEach(Array($items.enumerated()), id: \.element.id) { index, item in
+                content(item, index)
+                    .contentShape(.rect)
+                    .overlay(
+                        Group {
+                            if draggedIndex == index {
+                                Color.clear
+                            }
+                        }
+                    )
+                    .opacity(draggedIndex == index ? 0.3 : 1)
+                    .gesture(
+                        DragGesture()
+                            .onChanged { value in
+                                if draggedIndex == nil {
+                                    draggedIndex = index
+                                    draggingItem = items[index]
+                                }
+                                let itemHeight: CGFloat = 76
+                                let totalHeight = itemHeight * CGFloat(items.count)
+                                let offset = value.translation.height
+                                guard let currentIndex = draggedIndex else { return }
+
+                                let newIndex = min(max(0, currentIndex + Int(offset / itemHeight)), items.count - 1)
+                                if newIndex != currentIndex {
+                                    withAnimation(.spring(duration: 0.2)) {
+                                        let from = IndexSet([currentIndex])
+                                        onMove(from, newIndex > currentIndex ? newIndex + 1 : newIndex)
+                                        draggedIndex = newIndex
+                                    }
+                                }
+                            }
+                            .onEnded { _ in
+                                draggedIndex = nil
+                                draggingItem = nil
+                                dragOffset = .zero
+                            }
+                    )
+            }
+        }
+    }
+}
+
 struct ScrollViewScrollerConfigurator: NSViewRepresentable {
     let hidesVerticalScroller: Bool
 
@@ -599,11 +646,6 @@ struct IntegratedDictionaryRow: View {
 
                 Spacer()
 
-                // Latency indicator (for online sources)
-                if source.type.isOnline {
-                    latencyView
-                }
-
                 // Toggle
                 Toggle("", isOn: $source.isEnabled)
                     .labelsHidden()
@@ -625,6 +667,19 @@ struct IntegratedDictionaryRow: View {
 
                 downloadManagementBar
                     .padding(.leading, 52) // Align with content
+            }
+
+            // Bottom: Latency indicator (for online sources)
+            if source.type.isOnline {
+                Divider()
+                    .padding(.vertical, 8)
+                    .padding(.leading, 52) // Align with content
+
+                HStack {
+                    Spacer()
+                    latencyView
+                }
+                .padding(.leading, 52) // Align with content
             }
         }
         .padding(.horizontal, 12)
