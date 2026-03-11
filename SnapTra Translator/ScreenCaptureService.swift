@@ -12,11 +12,8 @@ struct CaptureRegion {
 final class ScreenCaptureService {
     let captureSize = CGSize(width: 520, height: 140)
     let paragraphCaptureScale: CGFloat = 0.6
-    
-    private var cachedDisplay: SCDisplay?
-    private var cachedDisplayID: CGDirectDisplayID?
-    private var lastCacheTime: Date?
-    private let cacheExpiration: TimeInterval = 5.0
+
+    private var cachedOwnWindows: [SCWindow] = []
 
     func captureAroundCursor() async -> (image: CGImage, region: CaptureRegion)? {
         let mouseLocation = NSEvent.mouseLocation
@@ -34,8 +31,8 @@ final class ScreenCaptureService {
         do {
             let display = try await getDisplay(for: displayID)
             guard let display else { return nil }
-            
-            let filter = SCContentFilter(display: display, excludingWindows: [])
+
+            let filter = SCContentFilter(display: display, excludingWindows: cachedOwnWindows)
             let configuration = makeConfiguration(for: cgRect, scaleFactor: scaleFactor)
             let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: configuration)
             return (image, CaptureRegion(rect: rectInScreen, screen: screen, displayID: displayID, scaleFactor: scaleFactor))
@@ -62,7 +59,7 @@ final class ScreenCaptureService {
             let display = try await getDisplay(for: displayID)
             guard let display else { return nil }
 
-            let filter = SCContentFilter(display: display, excludingWindows: [])
+            let filter = SCContentFilter(display: display, excludingWindows: cachedOwnWindows)
             let configuration = makeConfiguration(
                 for: cgRect,
                 scaleFactor: scaleFactor,
@@ -74,31 +71,23 @@ final class ScreenCaptureService {
             return nil
         }
     }
-    
+
     func invalidateCache() {
-        cachedDisplay = nil
-        cachedDisplayID = nil
-        lastCacheTime = nil
+        cachedOwnWindows = []
     }
-    
+
     private func getDisplay(for displayID: CGDirectDisplayID) async throws -> SCDisplay? {
-        let now = Date()
-        if let cached = cachedDisplay,
-           let cachedID = cachedDisplayID,
-           cachedID == displayID,
-           let cacheTime = lastCacheTime,
-           now.timeIntervalSince(cacheTime) < cacheExpiration {
-            return cached
-        }
-        
         let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
+
         guard let display = content.displays.first(where: { $0.displayID == displayID }) else {
             return nil
         }
-        
-        cachedDisplay = display
-        cachedDisplayID = displayID
-        lastCacheTime = now
+
+        // Always refresh our own app's window list so that overlay panels opened
+        // since the last capture are excluded immediately.
+        let ownPID = ProcessInfo.processInfo.processIdentifier
+        cachedOwnWindows = content.windows.filter { $0.owningApplication?.processID == ownPID }
+
         return display
     }
 
