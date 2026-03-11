@@ -131,12 +131,11 @@ struct SentenceServiceRow: View {
 
                 Spacer()
 
-                // Toggle (disabled for native translation)
+                // Toggle
                 Toggle("", isOn: $source.isEnabled)
                     .labelsHidden()
                     .toggleStyle(.switch)
                     .controlSize(.small)
-                    .disabled(source.isNative)
                     .onChange(of: source.isEnabled) { _, _ in
                         onToggle()
                     }
