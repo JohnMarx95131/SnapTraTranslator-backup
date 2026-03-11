@@ -23,12 +23,17 @@ struct HotkeyGestureStateMachine {
     let doubleTapInterval: TimeInterval
     let tapMaxDuration: TimeInterval
 
+    // 双击后长按阈值，超过此时间视为"按住显示模式"
+    let doubleTapHoldThreshold: TimeInterval
+
     init(
         doubleTapInterval: TimeInterval = 0.25,
-        tapMaxDuration: TimeInterval = 0.18
+        tapMaxDuration: TimeInterval = 0.18,
+        doubleTapHoldThreshold: TimeInterval = 1.0
     ) {
         self.doubleTapInterval = doubleTapInterval
         self.tapMaxDuration = tapMaxDuration
+        self.doubleTapHoldThreshold = doubleTapHoldThreshold
     }
 
     mutating func handlePress(now: Date) -> [HotkeyGestureEvent] {
@@ -72,7 +77,15 @@ struct HotkeyGestureStateMachine {
         if currentPressWasDoubleTap {
             currentPressWasDoubleTap = false
             lastEligibleTapReleaseAt = nil
-            return .none
+
+            // 检测双击后的按住时间
+            // 如果按住超过阈值，返回 .immediate 让用户可以松开关闭面板
+            // 如果快速释放，返回 .none 保持面板一直显示
+            if pressDuration > doubleTapHoldThreshold {
+                return .immediate  // 触发 onRelease，支持松开关闭
+            } else {
+                return .none  // 不触发 onRelease，面板一直显示
+            }
         }
 
         if pressDuration <= tapMaxDuration {

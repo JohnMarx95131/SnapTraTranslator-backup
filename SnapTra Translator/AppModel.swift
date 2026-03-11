@@ -269,7 +269,7 @@ final class AppModel: ObservableObject {
 
     func handleHotkeyDoubleTap() {
         guard isHotkeyActive else { return }
-        isHotkeyActive = false
+        // 保持 isHotkeyActive = true，让释放事件能正常处理
         activeLookupMode = .paragraph
         stopMouseTracking()
         let mouseLocation = NSEvent.mouseLocation
