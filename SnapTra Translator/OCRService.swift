@@ -423,22 +423,28 @@ final class OCRService {
         let maxHeight = max(previousHeight, nextHeight)
         guard minHeight > 0 else { return false }
 
+        // Lines with very different heights are likely different elements (e.g. heading vs body)
         let heightRatio = maxHeight / minHeight
-        guard heightRatio <= 1.8 else { return false }
+        guard heightRatio <= 1.4 else { return false }
 
+        // Vertical gap must be within normal line-spacing range (reduced from 1.6× to 1.2×)
         let verticalGap = max(previous.boundingBox.minY - next.boundingBox.maxY, 0)
-        guard verticalGap <= max(previousHeight, nextHeight) * 1.6 else { return false }
+        guard verticalGap <= max(previousHeight, nextHeight) * 1.2 else { return false }
 
-        let overlapWidth = previous.boundingBox.intersection(next.boundingBox).width
+        // Require meaningful horizontal overlap to join lines into a paragraph.
+        // Left-edge proximity alone is insufficient — headings and body text share a left margin
+        // but are distinct paragraphs.
+        // Compute horizontal overlap only (X axis), ignoring Y so that vertically-separated
+        // text lines on the same horizontal span are correctly joined.
+        let prevMinX = previous.boundingBox.minX
+        let prevMaxX = previous.boundingBox.maxX
+        let nextMinX = next.boundingBox.minX
+        let nextMaxX = next.boundingBox.maxX
+        let overlapWidth = max(0, min(prevMaxX, nextMaxX) - max(prevMinX, nextMinX))
         let minWidth = min(previous.boundingBox.width, next.boundingBox.width)
         let horizontalOverlapRatio = minWidth > 0 ? overlapWidth / minWidth : 0
-        let leftEdgeDistance = abs(previous.boundingBox.minX - next.boundingBox.minX)
 
-        if horizontalOverlapRatio >= 0.25 {
-            return true
-        }
-
-        return leftEdgeDistance <= max(previousHeight, nextHeight) * 4
+        return horizontalOverlapRatio >= 0.25
     }
 
     nonisolated private static func normalizedParagraphText(from lines: [RecognizedTextLine]) -> String {
