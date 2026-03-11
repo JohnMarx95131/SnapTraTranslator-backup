@@ -4,6 +4,8 @@ import SwiftUI
 struct OverlayView: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.colorScheme) private var colorScheme
+    @State private var isParagraphHeaderHovered = false
+    @State private var isParagraphHeaderDragging = false
     private let wordOverlayWidth: CGFloat = 380
     private let paragraphOverlayWidth: CGFloat = 520
     private let compactSectionMinHeight: CGFloat = 28
@@ -23,6 +25,15 @@ struct OverlayView: View {
             return true
         default:
             return !model.settings.continuousTranslation
+        }
+    }
+
+    private var isParagraphOverlayMode: Bool {
+        switch model.overlayState {
+        case .paragraphLoading, .paragraphResult:
+            return true
+        default:
+            return false
         }
     }
 
@@ -104,6 +115,14 @@ struct OverlayView: View {
         .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
         .shadow(color: .black.opacity(0.12), radius: 8, x: 0, y: 4)
         .shadow(color: .black.opacity(0.16), radius: 24, x: 0, y: 12)
+        .onChange(of: isParagraphOverlayMode) { _, isParagraphMode in
+            if !isParagraphMode {
+                resetParagraphHeaderInteractionState()
+            }
+        }
+        .onDisappear {
+            resetParagraphHeaderInteractionState()
+        }
     }
 
     // MARK: - Loading View
@@ -155,7 +174,7 @@ struct OverlayView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 Label {
-                    Text("识别鼠标所在英文段落中")
+                    Text(L("识别鼠标所在英文段落中"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .foregroundStyle(.primary)
                 } icon: {
@@ -164,7 +183,7 @@ struct OverlayView: View {
                 }
 
                 HStack(spacing: 8) {
-                    Text("正在执行全屏 OCR 与段落定位")
+                    Text(L("正在执行全屏 OCR 与段落定位"))
                         .font(.system(size: 13, weight: .medium, design: .rounded))
                         .foregroundStyle(.secondary)
                     LoadingDotsView()
@@ -186,10 +205,10 @@ struct OverlayView: View {
                     if let originalText = content.originalText,
                        !originalText.isEmpty {
                         paragraphSection(
-                            title: "English",
+                            titleKey: "English",
                             text: originalText,
-                            font: .system(size: 15, weight: .medium, design: .rounded),
-                            foreground: .primary
+                            font: .systemFont(ofSize: 15, weight: .medium),
+                            foreground: .labelColor
                         )
                     }
 
@@ -213,10 +232,10 @@ struct OverlayView: View {
 
                     case .ready(let text):
                         paragraphSection(
-                            title: "Translation",
+                            titleKey: "Translation",
                             text: text,
-                            font: .system(size: 17, weight: .semibold, design: .rounded),
-                            foreground: .primary
+                            font: .systemFont(ofSize: 17, weight: .semibold),
+                            foreground: .labelColor
                         )
 
                     case .failed(let message):
@@ -240,21 +259,23 @@ struct OverlayView: View {
 
     @ViewBuilder
     private func paragraphSection(
-        title: String,
+        titleKey: String,
         text: String,
-        font: Font,
-        foreground: Color
+        font: NSFont,
+        foreground: NSColor
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
+            Text(L(titleKey))
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
 
-            Text(text)
-                .font(font)
-                .foregroundStyle(foreground)
-                .fixedSize(horizontal: false, vertical: true)
+            SelectableTextView(
+                text: text,
+                font: font,
+                textColor: foreground
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 18)
         .padding(.bottom, 18)
@@ -263,7 +284,7 @@ struct OverlayView: View {
     @ViewBuilder
     private func paragraphTopBar(copyText: String?) -> some View {
         HStack(spacing: 8) {
-            Text("Paragraph")
+            Text(L("Paragraph"))
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .foregroundStyle(.secondary)
                 .tracking(0.5)
@@ -291,9 +312,70 @@ struct OverlayView: View {
                 .buttonStyle(.plain)
             }
         }
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            updateParagraphHeaderHover(hovering)
+        }
+        .simultaneousGesture(paragraphHeaderDragGesture)
         .padding(.horizontal, 18)
         .padding(.top, 16)
         .padding(.bottom, 12)
+    }
+
+    private var paragraphHeaderDragGesture: some Gesture {
+        DragGesture(minimumDistance: 1, coordinateSpace: .global)
+            .onChanged { value in
+                guard isParagraphOverlayMode else { return }
+
+                if !isParagraphHeaderDragging {
+                    isParagraphHeaderDragging = true
+                    refreshParagraphHeaderCursor()
+                    model.beginParagraphOverlayDrag()
+                }
+
+                model.updateParagraphOverlayDrag(translation: value.translation)
+            }
+            .onEnded { _ in
+                guard isParagraphHeaderDragging else { return }
+                model.endParagraphOverlayDrag()
+                isParagraphHeaderDragging = false
+                refreshParagraphHeaderCursor()
+            }
+    }
+
+    private func updateParagraphHeaderHover(_ hovering: Bool) {
+        guard isParagraphOverlayMode else {
+            resetParagraphHeaderInteractionState()
+            return
+        }
+
+        isParagraphHeaderHovered = hovering
+        refreshParagraphHeaderCursor()
+    }
+
+    private func refreshParagraphHeaderCursor() {
+        guard isParagraphOverlayMode else {
+            NSCursor.arrow.set()
+            return
+        }
+
+        if isParagraphHeaderDragging {
+            NSCursor.closedHand.set()
+        } else if isParagraphHeaderHovered {
+            NSCursor.openHand.set()
+        } else {
+            NSCursor.arrow.set()
+        }
+    }
+
+    private func resetParagraphHeaderInteractionState() {
+        if isParagraphHeaderDragging {
+            model.endParagraphOverlayDrag()
+        }
+
+        isParagraphHeaderDragging = false
+        isParagraphHeaderHovered = false
+        NSCursor.arrow.set()
     }
 
     @ViewBuilder
@@ -813,13 +895,77 @@ struct CopyButton: View {
                 .scaleEffect(copied ? 1.1 : 1.0)
         }
         .buttonStyle(.plain)
-        .help("Copy to clipboard")
+        .help(L("Copy to clipboard"))
     }
 
     private func copyToClipboard(_ text: String) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(text, forType: .string)
+    }
+}
+
+private struct SelectableTextView: NSViewRepresentable {
+    let text: String
+    let font: NSFont
+    let textColor: NSColor
+
+    func makeNSView(context: Context) -> NSTextView {
+        let textView = NSTextView(frame: .zero)
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.isRichText = false
+        textView.drawsBackground = false
+        textView.backgroundColor = .clear
+        textView.focusRingType = .none
+        textView.textContainerInset = .zero
+        textView.isHorizontallyResizable = false
+        textView.isVerticallyResizable = true
+        textView.autoresizingMask = [.width]
+        textView.textContainer?.lineFragmentPadding = 0
+        textView.textContainer?.widthTracksTextView = true
+        textView.textContainer?.lineBreakMode = .byWordWrapping
+        return textView
+    }
+
+    func updateNSView(_ textView: NSTextView, context: Context) {
+        textView.textStorage?.setAttributedString(makeAttributedString())
+
+        let currentWidth = max(textView.bounds.width, 1)
+        textView.textContainer?.containerSize = CGSize(
+            width: currentWidth,
+            height: .greatestFiniteMagnitude
+        )
+    }
+
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSTextView, context: Context) -> CGSize? {
+        guard let width = proposal.width, width > 0 else {
+            return CGSize(width: 0, height: font.pointSize)
+        }
+
+        let rect = makeAttributedString().boundingRect(
+            with: CGSize(width: width, height: .greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading]
+        )
+
+        return CGSize(
+            width: width,
+            height: max(ceil(rect.height), ceil(font.ascender - font.descender))
+        )
+    }
+
+    private func makeAttributedString() -> NSAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineBreakMode = .byWordWrapping
+
+        return NSAttributedString(
+            string: text,
+            attributes: [
+                .font: font,
+                .foregroundColor: textColor,
+                .paragraphStyle: paragraphStyle,
+            ]
+        )
     }
 }
 

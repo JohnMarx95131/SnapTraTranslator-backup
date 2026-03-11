@@ -174,6 +174,8 @@ final class AppModel: ObservableObject {
 
     private var globalMouseMonitor: Any?
     private var localMouseMonitor: Any?
+    private var globalParagraphKeyMonitor: Any?
+    private var localParagraphKeyMonitor: Any?
     private var debounceWorkItem: DispatchWorkItem?
     private var overlayLayoutRefreshWorkItem: DispatchWorkItem?
     private var lastOcrPosition: CGPoint?
@@ -242,6 +244,7 @@ final class AppModel: ObservableObject {
     func handleHotkeyTrigger() {
         isHotkeyActive = true
         activeLookupMode = .word
+        stopParagraphEscapeMonitoring()
         paragraphHighlightWindowController.hide()
         let mouseLocation = NSEvent.mouseLocation
         lastOcrPosition = mouseLocation
@@ -254,6 +257,7 @@ final class AppModel: ObservableObject {
     func handleHotkeyRelease() {
         isHotkeyActive = false
         activeLookupMode = .word
+        stopParagraphEscapeMonitoring()
         stopMouseTracking()
         debugOverlayWindowController.hide()
         paragraphHighlightWindowController.hide()
@@ -278,8 +282,23 @@ final class AppModel: ObservableObject {
     func dismissOverlay() {
         activeLookupMode = .word
         isHotkeyActive = false
+        stopParagraphEscapeMonitoring()
         cancelActiveLookupWork()
         hideOverlay()
+    }
+
+    func beginParagraphOverlayDrag() {
+        guard isParagraphOverlayPresented else { return }
+        overlayWindowController.beginManualPositioning()
+    }
+
+    func updateParagraphOverlayDrag(translation: CGSize) {
+        guard isParagraphOverlayPresented else { return }
+        overlayWindowController.moveBy(translation: translation)
+    }
+
+    func endParagraphOverlayDrag() {
+        overlayWindowController.endManualPositioning()
     }
     
     private func startMouseTracking() {
@@ -794,6 +813,8 @@ final class AppModel: ObservableObject {
                 overlayWindowController.setInteractive(true)
             }
         }
+
+        syncParagraphEscapeMonitoring()
     }
 
     private func sendNotification(title: String, body: String) {
@@ -1195,6 +1216,7 @@ final class AppModel: ObservableObject {
 
     private func hideOverlay() {
         activeLookupMode = .word
+        stopParagraphEscapeMonitoring()
         cancelPendingOverlayLayoutRefresh()
         if overlayState != .idle {
             overlayState = .idle
@@ -1230,5 +1252,55 @@ final class AppModel: ObservableObject {
     private func cancelPendingOverlayLayoutRefresh() {
         overlayLayoutRefreshWorkItem?.cancel()
         overlayLayoutRefreshWorkItem = nil
+    }
+
+    private var isParagraphOverlayPresented: Bool {
+        activeLookupMode == .paragraph && overlayState != .idle
+    }
+
+    private func syncParagraphEscapeMonitoring() {
+        if isParagraphOverlayPresented {
+            startParagraphEscapeMonitoringIfNeeded()
+        } else {
+            stopParagraphEscapeMonitoring()
+        }
+    }
+
+    private func startParagraphEscapeMonitoringIfNeeded() {
+        guard globalParagraphKeyMonitor == nil, localParagraphKeyMonitor == nil else { return }
+
+        globalParagraphKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            Task { @MainActor in
+                _ = self?.handleParagraphEscapeKey(event)
+            }
+        }
+
+        localParagraphKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self else { return event }
+            let handled = MainActor.assumeIsolated {
+                self.handleParagraphEscapeKey(event)
+            }
+            return handled ? nil : event
+        }
+    }
+
+    private func stopParagraphEscapeMonitoring() {
+        if let monitor = globalParagraphKeyMonitor {
+            NSEvent.removeMonitor(monitor)
+            globalParagraphKeyMonitor = nil
+        }
+
+        if let monitor = localParagraphKeyMonitor {
+            NSEvent.removeMonitor(monitor)
+            localParagraphKeyMonitor = nil
+        }
+    }
+
+    @discardableResult
+    private func handleParagraphEscapeKey(_ event: NSEvent) -> Bool {
+        guard isParagraphOverlayPresented else { return false }
+        guard event.keyCode == 53 else { return false }
+        dismissOverlay()
+        return true
     }
 }

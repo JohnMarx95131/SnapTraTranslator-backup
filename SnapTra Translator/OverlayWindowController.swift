@@ -1,6 +1,11 @@
 import AppKit
 import SwiftUI
 
+private final class OverlayPanel: NSPanel {
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
+}
+
 // MARK: - Debug OCR Border View
 
 struct DebugOCRBorderView: View {
@@ -166,11 +171,13 @@ final class ParagraphHighlightWindowController: NSWindowController {
 final class OverlayWindowController: NSWindowController {
     private let hostingView: NSHostingView<AnyView>
     private var lastAnchor: CGPoint?
+    private var manualOrigin: CGPoint?
+    private var dragStartOrigin: CGPoint?
     private let frameTolerance: CGFloat = 0.5
 
     init(model: AppModel) {
         hostingView = NSHostingView(rootView: AnyView(OverlayView().environmentObject(model)))
-        let panel = NSPanel(
+        let panel = OverlayPanel(
             contentRect: CGRect(x: 0, y: 0, width: 380, height: 200),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
@@ -218,12 +225,43 @@ final class OverlayWindowController: NSWindowController {
     func move(to anchor: CGPoint) {
         guard let window else { return }
         lastAnchor = anchor
+        manualOrigin = nil
+        dragStartOrigin = nil
         guard window.isVisible else { return }
 
         let screenFrame = visibleScreenFrame(for: anchor)
-        let origin = clampedOrigin(for: anchor, size: window.frame.size, in: screenFrame)
+        let origin = anchoredOrigin(for: anchor, size: window.frame.size, in: screenFrame)
         let targetFrame = CGRect(origin: origin, size: window.frame.size)
         applyFrameIfNeeded(targetFrame)
+    }
+
+    func beginManualPositioning() {
+        guard let window, window.isVisible else { return }
+        dragStartOrigin = window.frame.origin
+        manualOrigin = window.frame.origin
+    }
+
+    func moveBy(translation: CGSize) {
+        guard let window, window.isVisible else { return }
+
+        let baseOrigin = dragStartOrigin ?? manualOrigin ?? window.frame.origin
+        let proposedOrigin = CGPoint(
+            x: baseOrigin.x + translation.width,
+            y: baseOrigin.y - translation.height
+        )
+        let screenPoint = CGPoint(
+            x: proposedOrigin.x + window.frame.width / 2,
+            y: proposedOrigin.y + window.frame.height / 2
+        )
+        let screenFrame = visibleScreenFrame(for: screenPoint)
+        let clamped = clampedOrigin(proposedOrigin, size: window.frame.size, in: screenFrame)
+
+        manualOrigin = clamped
+        applyOriginIfNeeded(clamped)
+    }
+
+    func endManualPositioning() {
+        dragStartOrigin = nil
     }
 
     func refreshLayoutIfNeeded(at anchor: CGPoint? = nil) {
@@ -243,14 +281,29 @@ final class OverlayWindowController: NSWindowController {
 
     func hide() {
         lastAnchor = nil
+        manualOrigin = nil
+        dragStartOrigin = nil
         window?.orderOut(nil)
     }
 
     private func measuredFrame(for anchor: CGPoint) -> CGRect {
         hostingView.layoutSubtreeIfNeeded()
         let size = hostingView.fittingSize
-        let screenFrame = visibleScreenFrame(for: anchor)
-        let origin = clampedOrigin(for: anchor, size: size, in: screenFrame)
+        let origin: CGPoint
+
+        if let manualOrigin {
+            let screenPoint = CGPoint(
+                x: manualOrigin.x + size.width / 2,
+                y: manualOrigin.y + size.height / 2
+            )
+            let screenFrame = visibleScreenFrame(for: screenPoint)
+            origin = clampedOrigin(manualOrigin, size: size, in: screenFrame)
+            self.manualOrigin = origin
+        } else {
+            let screenFrame = visibleScreenFrame(for: anchor)
+            origin = anchoredOrigin(for: anchor, size: size, in: screenFrame)
+        }
+
         return CGRect(origin: origin, size: size)
     }
 
@@ -262,7 +315,25 @@ final class OverlayWindowController: NSWindowController {
     private func applyFrameIfNeeded(_ targetFrame: CGRect) {
         guard let window else { return }
         guard frameNeedsUpdate(from: window.frame, to: targetFrame) else { return }
+
+        let widthDelta = abs(window.frame.size.width - targetFrame.size.width)
+        let heightDelta = abs(window.frame.size.height - targetFrame.size.height)
+        if widthDelta <= frameTolerance, heightDelta <= frameTolerance {
+            applyOriginIfNeeded(targetFrame.origin)
+            return
+        }
+
         window.setFrame(targetFrame, display: true)
+    }
+
+    private func applyOriginIfNeeded(_ targetOrigin: CGPoint) {
+        guard let window else { return }
+
+        let xNeedsUpdate = abs(window.frame.origin.x - targetOrigin.x) > frameTolerance
+        let yNeedsUpdate = abs(window.frame.origin.y - targetOrigin.y) > frameTolerance
+        guard xNeedsUpdate || yNeedsUpdate else { return }
+
+        window.setFrameOrigin(targetOrigin)
     }
 
     private func frameNeedsUpdate(from current: CGRect, to target: CGRect) -> Bool {
@@ -272,9 +343,14 @@ final class OverlayWindowController: NSWindowController {
             || abs(current.size.height - target.size.height) > frameTolerance
     }
 
-    private func clampedOrigin(for anchor: CGPoint, size: CGSize, in screenFrame: CGRect) -> CGPoint {
+    private func anchoredOrigin(for anchor: CGPoint, size: CGSize, in screenFrame: CGRect) -> CGPoint {
         let offset = CGPoint(x: 12, y: -12)
-        var origin = CGPoint(x: anchor.x + offset.x, y: anchor.y + offset.y - size.height)
+        let proposedOrigin = CGPoint(x: anchor.x + offset.x, y: anchor.y + offset.y - size.height)
+        return clampedOrigin(proposedOrigin, size: size, in: screenFrame)
+    }
+
+    private func clampedOrigin(_ proposedOrigin: CGPoint, size: CGSize, in screenFrame: CGRect) -> CGPoint {
+        var origin = proposedOrigin
         let shadowMargin: CGFloat = 50
         let minX = screenFrame.minX + shadowMargin
         let maxX = screenFrame.maxX - size.width - shadowMargin
