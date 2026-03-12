@@ -3,6 +3,10 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var model: AppModel
 
+    private var hasAnyPronunciationEnabled: Bool {
+        model.settings.playWordPronunciation || model.settings.playSentencePronunciation
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -56,21 +60,62 @@ struct SettingsView: View {
                         Divider()
                             .opacity(0.5)
 
-                        SettingsToggleRow(
-                            title: L("Play pronunciation"),
-                            subtitle: L("Audio playback after translation"),
-                            isOn: $model.settings.playPronunciation
-                        )
+                        HStack(spacing: 12) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(L("Pronunciation"))
+                                    .font(.system(size: 13, weight: .regular))
+                                    .foregroundStyle(.primary)
+                                Text(L("Auto-play after translation"))
+                                    .font(.system(size: 11, weight: .regular))
+                                    .foregroundStyle(.tertiary)
+                            }
+                            Spacer()
+                            HStack(spacing: 6) {
+Text(L("Word"))
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(model.settings.playWordPronunciation ? Color.accentColor : .primary)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .fill(model.settings.playWordPronunciation ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.08))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .strokeBorder(model.settings.playWordPronunciation ? Color.accentColor.opacity(0.5) : Color.secondary.opacity(0.2), lineWidth: 1)
+                                )
+                                .onTapGesture {
+                                    model.settings.playWordPronunciation.toggle()
+                                }
+
+                            Text(L("Sentence"))
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(model.settings.playSentencePronunciation ? Color.accentColor : .primary)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .fill(model.settings.playSentencePronunciation ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.08))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .strokeBorder(model.settings.playSentencePronunciation ? Color.accentColor.opacity(0.5) : Color.secondary.opacity(0.2), lineWidth: 1)
+                                )
+                                .onTapGesture {
+                                    model.settings.playSentencePronunciation.toggle()
+                                }
+                            }
+                        }
 
                         Divider()
                             .opacity(0.5)
 
-                        // TTS Provider Selector
                         TTSProviderSelectorRow(
                             title: L("Pronunciation Service"),
                             subtitle: L("Choose the voice service for pronunciation"),
                             selection: $model.settings.ttsProvider
                         )
+                        .opacity(hasAnyPronunciationEnabled ? 1 : 0.5)
                     }
                 }
 

@@ -45,6 +45,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
 
     // Store menu items that need state updates
     private weak var pronunciationMenuItem: NSMenuItem?
+    private weak var wordPronunciationMenuItem: NSMenuItem?
+    private weak var sentencePronunciationMenuItem: NSMenuItem?
     private weak var continuousTranslationMenuItem: NSMenuItem?
     private weak var providerInfoMenuItem: NSMenuItem?
 
@@ -78,7 +80,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             }
             .store(in: &cancellables)
 
-        model.settings.$playPronunciation
+        model.settings.$playWordPronunciation
+            .combineLatest(model.settings.$playSentencePronunciation)
             .combineLatest(model.settings.$ttsProvider)
             .sink { [weak self] _, _ in
                 self?.updateDynamicMenuItems()
@@ -171,17 +174,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         continuousItem.target = self
         menu.addItem(continuousItem)
 
-        // Pronunciation toggle
-        let pronunciationItem = NSMenuItem(
-            title: L("Pronunciation"),
-            action: #selector(togglePronunciation),
+        // Pronunciation submenu
+        let pronunciationSubmenu = NSMenu()
+        
+        let wordPronunciationItem = NSMenuItem(
+            title: L("Word"),
+            action: #selector(toggleWordPronunciation),
             keyEquivalent: ""
         )
-        pronunciationItem.target = self
-        menu.addItem(pronunciationItem)
-        self.pronunciationMenuItem = pronunciationItem
-
-        // Provider info (read-only, shows current TTS provider)
+        wordPronunciationItem.target = self
+        pronunciationSubmenu.addItem(wordPronunciationItem)
+        self.wordPronunciationMenuItem = wordPronunciationItem
+        
+        let sentencePronunciationItem = NSMenuItem(
+            title: L("Sentence"),
+            action: #selector(toggleSentencePronunciation),
+            keyEquivalent: ""
+        )
+        sentencePronunciationItem.target = self
+        pronunciationSubmenu.addItem(sentencePronunciationItem)
+        self.sentencePronunciationMenuItem = sentencePronunciationItem
+        
+        // Provider info in submenu
         let providerItem = NSMenuItem(
             title: "",
             action: nil,
@@ -189,8 +203,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         )
         providerItem.isEnabled = false
         providerItem.indentationLevel = 1
-        menu.addItem(providerItem)
+        pronunciationSubmenu.addItem(providerItem)
         self.providerInfoMenuItem = providerItem
+        
+        let pronunciationMenuItem = NSMenuItem(
+            title: L("Pronunciation"),
+            action: nil,
+            keyEquivalent: ""
+        )
+        pronunciationMenuItem.submenu = pronunciationSubmenu
+        menu.addItem(pronunciationMenuItem)
+        self.pronunciationMenuItem = pronunciationMenuItem
         
         // Actions section
         // Settings
@@ -242,8 +265,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     }
 
     private func updateDynamicMenuItems() {
-        // Update pronunciation menu item state (checkmark)
-        pronunciationMenuItem?.state = model.settings.playPronunciation ? .on : .off
+        // Update pronunciation submenu item states
+        wordPronunciationMenuItem?.state = model.settings.playWordPronunciation ? .on : .off
+        sentencePronunciationMenuItem?.state = model.settings.playSentencePronunciation ? .on : .off
         
         // Update continuous translation menu item state (checkmark)
         continuousTranslationMenuItem?.state = model.settings.continuousTranslation ? .on : .off
@@ -285,8 +309,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     // When statusItem.menu is set, the system handles menu display automatically
     @objc private func statusItemClicked(_ sender: NSStatusBarButton) {}
 
-    @objc private func togglePronunciation() {
-        model.settings.playPronunciation.toggle()
+    @objc private func toggleWordPronunciation() {
+        model.settings.playWordPronunciation.toggle()
+    }
+
+    @objc private func toggleSentencePronunciation() {
+        model.settings.playSentencePronunciation.toggle()
     }
 
     @objc private func toggleContinuousTranslation() {

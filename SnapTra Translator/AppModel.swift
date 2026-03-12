@@ -489,7 +489,7 @@ final class AppModel: ObservableObject {
             let sourceLanguage = languagePair.sourceLanguage
             let targetLanguage = languagePair.targetLanguage
 
-            if settings.playPronunciation {
+            if settings.playWordPronunciation {
                 let languageCode = sourceLanguage.languageCode?.identifier
                 speechService.speak(
                     selected.text,
@@ -624,7 +624,7 @@ final class AppModel: ObservableObject {
                 let languagePair = resolveParagraphLanguagePair()
                 let sourceLanguage = languagePair.sourceLanguage
 
-                if settings.playPronunciation {
+if settings.playSentencePronunciation {
                     let languageCode = sourceLanguage.languageCode?.identifier
                     speechService.speak(
                         paragraph.text,

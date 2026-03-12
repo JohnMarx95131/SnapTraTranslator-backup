@@ -123,6 +123,8 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 
 enum AppSettingKey {
     static let playPronunciation = "playPronunciation"
+    static let playWordPronunciation = "playWordPronunciation"
+    static let playSentencePronunciation = "playSentencePronunciation"
     static let launchAtLogin = "launchAtLogin"
     static let singleKey = "singleKey"
     static let sourceLanguage = "sourceLanguage"

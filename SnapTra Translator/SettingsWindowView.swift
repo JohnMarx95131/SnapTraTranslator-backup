@@ -305,11 +305,54 @@ struct GeneralSettingsView: View {
                             .opacity(0.5)
                     }
 
-                    ToggleRow(
-                        title: L("Play Pronunciation"),
-                        subtitle: L("Audio playback after translation"),
-                        isOn: $model.settings.playPronunciation
-                    )
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(L("Pronunciation"))
+                                .font(.system(size: 13, weight: .regular))
+                                .foregroundStyle(.primary)
+                            Text(L("Audio playback after translation"))
+                                .font(.system(size: 11, weight: .regular))
+                                .foregroundStyle(.tertiary)
+                        }
+                        Spacer()
+                        HStack(spacing: 6) {
+                            Text(L("Word"))
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(model.settings.playWordPronunciation ? Color.accentColor : .primary)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .fill(model.settings.playWordPronunciation ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.08))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .strokeBorder(model.settings.playWordPronunciation ? Color.accentColor.opacity(0.5) : Color.secondary.opacity(0.2), lineWidth: 1)
+                                )
+                                .onTapGesture {
+                                    model.settings.playWordPronunciation.toggle()
+                                }
+
+                            Text(L("Sentence"))
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(model.settings.playSentencePronunciation ? Color.accentColor : .primary)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .fill(model.settings.playSentencePronunciation ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.08))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .strokeBorder(model.settings.playSentencePronunciation ? Color.accentColor.opacity(0.5) : Color.secondary.opacity(0.2), lineWidth: 1)
+                                )
+                                .onTapGesture {
+                                    model.settings.playSentencePronunciation.toggle()
+                                }
+                        }
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
 
                     Divider()
                         .padding(.horizontal, 14)

@@ -64,8 +64,11 @@ extension SentenceTranslationSource.SourceType {
 
 @MainActor
 final class SettingsStore: ObservableObject {
-    @Published var playPronunciation: Bool {
-        didSet { defaults.set(playPronunciation, forKey: AppSettingKey.playPronunciation) }
+    @Published var playWordPronunciation: Bool {
+        didSet { defaults.set(playWordPronunciation, forKey: AppSettingKey.playWordPronunciation) }
+    }
+    @Published var playSentencePronunciation: Bool {
+        didSet { defaults.set(playSentencePronunciation, forKey: AppSettingKey.playSentencePronunciation) }
     }
     @Published var launchAtLogin: Bool {
         didSet { defaults.set(launchAtLogin, forKey: AppSettingKey.launchAtLogin) }
@@ -117,14 +120,30 @@ final class SettingsStore: ObservableObject {
 
     init(defaults: UserDefaults = .standard, loginItemStatus: Bool? = nil) {
         self.defaults = defaults
-        let playPronunciationValue = defaults.object(forKey: AppSettingKey.playPronunciation) as? Bool
+
+        // Migration: check if old playPronunciation exists but new keys don't
+        let hasOldKey = defaults.object(forKey: AppSettingKey.playPronunciation) != nil
+        let hasNewKeys = defaults.object(forKey: AppSettingKey.playWordPronunciation) != nil
+            || defaults.object(forKey: AppSettingKey.playSentencePronunciation) != nil
+
+        if hasOldKey && !hasNewKeys {
+            // Migrate from old single toggle to two separate toggles
+            let oldValue = defaults.bool(forKey: AppSettingKey.playPronunciation)
+            playWordPronunciation = oldValue
+            playSentencePronunciation = oldValue
+        } else {
+            let playWordPronunciationValue = defaults.object(forKey: AppSettingKey.playWordPronunciation) as? Bool
+            let playSentencePronunciationValue = defaults.object(forKey: AppSettingKey.playSentencePronunciation) as? Bool
+            playWordPronunciation = playWordPronunciationValue ?? true
+            playSentencePronunciation = playSentencePronunciationValue ?? true
+        }
+
         let launchAtLoginValue = defaults.object(forKey: AppSettingKey.launchAtLogin) as? Bool
         let loginStatus = loginItemStatus ?? LoginItemManager.isEnabled()
         let singleKeyValue = defaults.string(forKey: AppSettingKey.singleKey)
         let debugShowOcrRegionValue = defaults.object(forKey: AppSettingKey.debugShowOcrRegion) as? Bool
         let continuousTranslationValue = defaults.object(forKey: AppSettingKey.continuousTranslation) as? Bool
 
-        playPronunciation = playPronunciationValue ?? true
         launchAtLogin = launchAtLoginValue ?? loginStatus
         singleKey = SingleKey(rawValue: singleKeyValue ?? "leftControl") ?? .leftControl
         sourceLanguage = defaults.string(forKey: AppSettingKey.sourceLanguage) ?? "en"
