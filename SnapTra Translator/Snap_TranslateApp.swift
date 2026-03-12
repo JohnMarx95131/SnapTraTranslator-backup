@@ -162,6 +162,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         menu.addItem(.separator())
         
         // Status section - toggle items with checkmarks
+        // Continuous translation toggle
+        let continuousItem = NSMenuItem(
+            title: L("Continuous Translation"),
+            action: #selector(toggleContinuousTranslation),
+            keyEquivalent: ""
+        )
+        continuousItem.target = self
+        menu.addItem(continuousItem)
+
         // Pronunciation toggle
         let pronunciationItem = NSMenuItem(
             title: L("Pronunciation"),
@@ -182,18 +191,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         providerItem.indentationLevel = 1
         menu.addItem(providerItem)
         self.providerInfoMenuItem = providerItem
-
-        menu.addItem(.separator())
-
-        // Continuous translation toggle
-        let continuousItem = NSMenuItem(
-            title: L("Continuous Translation"),
-            action: #selector(toggleContinuousTranslation),
-            keyEquivalent: ""
-        )
-        continuousItem.target = self
-        menu.addItem(continuousItem)
-        self.continuousTranslationMenuItem = continuousItem
         
         // Actions section
         // Settings
