@@ -298,20 +298,10 @@ struct OverlayView: View {
                         }
                     }
                 } else if case .failed(let message) = content.translationState {
-                    // No card styling for error message - display inline
-                    HStack(alignment: .center, spacing: 10) {
-                        Image(systemName: "exclamationmark.circle")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(.secondary)
-
-                        Text(message)
-                            .font(.system(size: 15, weight: .medium, design: .rounded))
-                            .foregroundStyle(.primary)
-
-                        Spacer(minLength: 0)
-                    }
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 18)
+                    // Auto-dismiss error view for paragraph translation errors
+                    AutoDismissErrorView(message: message, onDismiss: { model.dismissOverlay() })
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 18)
                 }
             }
         }
@@ -1052,16 +1042,7 @@ struct OverlayView: View {
 
     @ViewBuilder
     private func errorView(message: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(Color(red: 1.0, green: 0.58, blue: 0.0))
-            Text(message)
-                .font(.system(size: 14, weight: .medium, design: .rounded))
-                .foregroundStyle(.primary)
-        }
-        .padding(.vertical, 16)
-        .padding(.horizontal, 18)
+        AutoDismissErrorView(message: message, onDismiss: { model.dismissOverlay() })
     }
 
     // MARK: - No Word View
@@ -1460,4 +1441,56 @@ private struct ParagraphSectionCopyButton: View {
         ))
         .frame(width: 500, height: 300)
         .background(.gray.opacity(0.3))
+}
+
+// MARK: - Auto Dismiss Error View
+
+private struct AutoDismissErrorView: View {
+    let message: String
+    let onDismiss: () -> Void
+    @State private var remainingSeconds: Double = 3.0
+    @State private var timer: Timer?
+
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 12) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(Color(red: 1.0, green: 0.58, blue: 0.0))
+                Text(message)
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .foregroundStyle(.primary)
+                Spacer(minLength: 0)
+            }
+
+            HStack(spacing: 6) {
+                Image(systemName: "clock")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(.secondary)
+                Text(String(format: "%.0fs", max(1, remainingSeconds)))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+        }
+        .padding(.vertical, 14)
+        .padding(.horizontal, 18)
+        .onAppear {
+            startCountdown()
+        }
+        .onDisappear {
+            timer?.invalidate()
+        }
+    }
+
+    private func startCountdown() {
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            remainingSeconds -= 0.1
+            if remainingSeconds <= 0 {
+                timer?.invalidate()
+                timer = nil
+                onDismiss()
+            }
+        }
+    }
 }
