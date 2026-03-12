@@ -7,6 +7,7 @@ struct OverlayView: View {
 
     @EnvironmentObject var model: AppModel
     @Environment(\.colorScheme) private var colorScheme
+    @StateObject private var localizationManager = LocalizationManager.shared
     @State private var isParagraphHeaderHovered = false
     @State private var isParagraphHeaderDragging = false
     private let wordOverlayWidth: CGFloat = 380
@@ -281,7 +282,7 @@ struct OverlayView: View {
 
                     case .failed(let message):
                         VStack(alignment: .leading, spacing: 0) {
-                            paragraphErrorContent(message: message)
+                            paragraphErrorContent(message: L(message))
                                 .padding(.horizontal, 18)
                                 .padding(.vertical, 14)
                         }
@@ -299,7 +300,7 @@ struct OverlayView: View {
                     }
                 } else if case .failed(let message) = content.translationState {
                     // Auto-dismiss error view for paragraph translation errors
-                    AutoDismissErrorView(message: message, onDismiss: { model.dismissOverlay() })
+                    AutoDismissErrorView(message: L(message), onDismiss: { model.dismissOverlay() })
                         .padding(.horizontal, 18)
                         .padding(.vertical, 18)
                 }
