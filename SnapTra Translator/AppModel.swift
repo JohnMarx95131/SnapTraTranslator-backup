@@ -639,9 +639,6 @@ final class AppModel: ObservableObject {
                 )
                 updateOverlay(state: .paragraphResult(initialContent), anchor: mouseLocation)
 
-                // 句子范围已确定，用动画将面板对齐到句子正上/下方
-                overlayWindowController.alignToSentenceRect(paragraphRect, animated: true)
-
                 let languagePair = resolveParagraphLanguagePair()
                 let sourceLanguage = languagePair.sourceLanguage
                 let targetLanguage = languagePair.targetLanguage
@@ -961,7 +958,17 @@ final class AppModel: ObservableObject {
             sendNotification(title: "SnapTra Translator", body: message)
         case .idle:
             break
-        case .result, .paragraphResult:
+        case .paragraphLoading, .paragraphResult:
+            if overlayState != state {
+                overlayState = state
+            }
+            if overlayWindowController.isVisible {
+                refreshParagraphOverlayLayoutImmediately()
+            } else {
+                overlayWindowController.show(at: overlayAnchor, makeKey: activeLookupMode == .paragraph)
+            }
+            overlayWindowController.setInteractive(true)
+        case .result:
             if overlayState != state {
                 overlayState = state
             }
@@ -1432,6 +1439,22 @@ final class AppModel: ObservableObject {
     private func cancelPendingOverlayLayoutRefresh() {
         overlayLayoutRefreshWorkItem?.cancel()
         overlayLayoutRefreshWorkItem = nil
+    }
+
+    private func refreshParagraphOverlayLayoutImmediately() {
+        guard overlayWindowController.isVisible else { return }
+
+        cancelPendingOverlayLayoutRefresh()
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            guard self.overlayWindowController.isVisible else { return }
+
+            if let sentenceRect = self.activeParagraphRect {
+                self.overlayWindowController.alignToSentenceRect(sentenceRect, animated: true)
+            } else {
+                self.overlayWindowController.refreshLayoutIfNeeded(at: self.overlayAnchor)
+            }
+        }
     }
 
     private var isParagraphOverlayPresented: Bool {

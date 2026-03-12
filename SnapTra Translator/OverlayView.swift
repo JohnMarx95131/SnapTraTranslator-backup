@@ -70,7 +70,7 @@ struct OverlayView: View {
     }
 
     var body: some View {
-        ZStack {
+        Group {
             if isVisible {
                 overlayContent
             }
@@ -1249,15 +1249,29 @@ private final class SelectableTextContainerView: NSView {
             return 0
         }
 
+        let resolvedWidth = max(1, ceil(width))
         textContainer.containerSize = CGSize(
-            width: width,
+            width: resolvedWidth,
             height: CGFloat.greatestFiniteMagnitude
         )
+        if textView.frame.width != resolvedWidth {
+            textView.frame = CGRect(x: 0, y: 0, width: resolvedWidth, height: textView.frame.height)
+        }
+
+        let glyphRange = layoutManager.glyphRange(for: textContainer)
         layoutManager.ensureLayout(for: textContainer)
 
-        let usedRect = layoutManager.usedRect(for: textContainer)
         let minimumHeight = ceil((textView.font?.ascender ?? 0) - (textView.font?.descender ?? 0))
-        let textHeight = ceil(usedRect.height) + textView.textContainerInset.height * 2
+        var maxLineFragmentY: CGFloat = 0
+        layoutManager.enumerateLineFragments(forGlyphRange: glyphRange) { _, usedRect, _, _, _ in
+            maxLineFragmentY = max(maxLineFragmentY, usedRect.maxY)
+        }
+
+        if layoutManager.extraLineFragmentTextContainer == textContainer {
+            maxLineFragmentY = max(maxLineFragmentY, layoutManager.extraLineFragmentRect.maxY)
+        }
+
+        let textHeight = ceil(maxLineFragmentY) + textView.textContainerInset.height * 2
         let resolvedHeight = max(minimumHeight, textHeight)
 
         cachedMeasurement = (width, resolvedHeight)

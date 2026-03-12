@@ -330,8 +330,12 @@ final class OverlayWindowController: NSWindowController {
     private var dragStartOrigin: CGPoint?
     private var currentParagraphOverlayMaxHeight: CGFloat?
     private var currentParagraphOverlayScrollingEnabled = false
+    private var paragraphFrameAnimationTask: Task<Void, Never>?
+    private var paragraphFrameAnimationID = UUID()
     private let frameTolerance: CGFloat = 0.5
-    private let paragraphOverlayRenderedHeightSafetyInset: CGFloat = 24
+    private let paragraphOverlayRenderedHeightSafetyInset: CGFloat = 8
+    private let paragraphFrameAnimationDuration: TimeInterval = 0.18
+    private let paragraphFrameAnimationStepNanoseconds: UInt64 = 16_666_667
 
     init(model: AppModel) {
         self.model = model
@@ -376,6 +380,7 @@ final class OverlayWindowController: NSWindowController {
         let targetFrame = measuredFrame(for: anchor)
 
         if !window.isVisible {
+            cancelParagraphFrameAnimation()
             window.setFrame(targetFrame, display: true)
             window.orderFrontRegardless()
             if makeKey {
@@ -391,6 +396,7 @@ final class OverlayWindowController: NSWindowController {
         lastAnchor = anchor
         manualOrigin = nil
         dragStartOrigin = nil
+        cancelParagraphFrameAnimation()
         guard window.isVisible else { return }
 
         let screenFrame = visibleScreenFrame(for: anchor)
@@ -474,12 +480,14 @@ final class OverlayWindowController: NSWindowController {
 
     func beginManualPositioning() {
         guard let window, window.isVisible else { return }
+        cancelParagraphFrameAnimation()
         dragStartOrigin = window.frame.origin
         manualOrigin = window.frame.origin
     }
 
     func moveBy(translation: CGSize) {
         guard let window, window.isVisible else { return }
+        cancelParagraphFrameAnimation()
 
         let baseOrigin = dragStartOrigin ?? manualOrigin ?? window.frame.origin
         let proposedOrigin = CGPoint(
@@ -520,6 +528,7 @@ final class OverlayWindowController: NSWindowController {
         lastAnchor = nil
         manualOrigin = nil
         dragStartOrigin = nil
+        cancelParagraphFrameAnimation()
         applyParagraphOverlayLayout(maxHeight: nil, scrollingEnabled: false)
         window?.orderOut(nil)
     }
@@ -610,18 +619,53 @@ final class OverlayWindowController: NSWindowController {
     private func applyFrameAnimated(_ targetFrame: CGRect) {
         guard let window else { return }
         guard frameNeedsUpdate(from: window.frame, to: targetFrame) else { return }
+        cancelParagraphFrameAnimation()
 
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.28
-            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            context.allowsImplicitAnimation = true
-            window.animator().setFrame(targetFrame, display: true)
+        let startFrame = window.frame
+        let animationID = UUID()
+        paragraphFrameAnimationID = animationID
+
+        paragraphFrameAnimationTask = Task { @MainActor [weak self] in
+            guard let self, let window = self.window else { return }
+
+            let startTime = ProcessInfo.processInfo.systemUptime
+            while !Task.isCancelled {
+                let elapsed = ProcessInfo.processInfo.systemUptime - startTime
+                let rawProgress = min(max(elapsed / self.paragraphFrameAnimationDuration, 0), 1)
+                let easedProgress = self.easeInOutProgress(rawProgress)
+                let interpolatedFrame = self.interpolatedFrame(
+                    from: startFrame,
+                    to: targetFrame,
+                    progress: easedProgress
+                )
+                window.setFrame(interpolatedFrame, display: true)
+
+                if rawProgress >= 1 {
+                    break
+                }
+
+                try? await Task.sleep(nanoseconds: self.paragraphFrameAnimationStepNanoseconds)
+            }
+
+            guard !Task.isCancelled else {
+                if self.paragraphFrameAnimationID == animationID {
+                    self.paragraphFrameAnimationTask = nil
+                }
+                return
+            }
+
+            window.setFrame(targetFrame, display: true)
+            self.hostingView.layoutSubtreeIfNeeded()
+            if self.paragraphFrameAnimationID == animationID {
+                self.paragraphFrameAnimationTask = nil
+            }
         }
     }
 
     private func applyFrameIfNeeded(_ targetFrame: CGRect) {
         guard let window else { return }
         guard frameNeedsUpdate(from: window.frame, to: targetFrame) else { return }
+        cancelParagraphFrameAnimation()
 
         let widthDelta = abs(window.frame.size.width - targetFrame.size.width)
         let heightDelta = abs(window.frame.size.height - targetFrame.size.height)
@@ -631,6 +675,7 @@ final class OverlayWindowController: NSWindowController {
         }
 
         window.setFrame(targetFrame, display: true)
+        hostingView.layoutSubtreeIfNeeded()
     }
 
     private func applyOriginIfNeeded(_ targetOrigin: CGPoint) {
@@ -640,6 +685,7 @@ final class OverlayWindowController: NSWindowController {
         let yNeedsUpdate = abs(window.frame.origin.y - targetOrigin.y) > frameTolerance
         guard xNeedsUpdate || yNeedsUpdate else { return }
 
+        cancelParagraphFrameAnimation()
         window.setFrameOrigin(targetOrigin)
     }
 
@@ -666,5 +712,32 @@ final class OverlayWindowController: NSWindowController {
         origin.x = min(max(origin.x, minX), maxX)
         origin.y = min(max(origin.y, minY), maxY)
         return origin
+    }
+
+    private func cancelParagraphFrameAnimation() {
+        paragraphFrameAnimationTask?.cancel()
+        paragraphFrameAnimationTask = nil
+        paragraphFrameAnimationID = UUID()
+    }
+
+    private func easeInOutProgress(_ progress: Double) -> CGFloat {
+        let clamped = min(max(progress, 0), 1)
+        let eased = clamped < 0.5
+            ? 4 * clamped * clamped * clamped
+            : 1 - pow(-2 * clamped + 2, 3) / 2
+        return CGFloat(eased)
+    }
+
+    private func interpolatedFrame(from start: CGRect, to end: CGRect, progress: CGFloat) -> CGRect {
+        CGRect(
+            x: interpolatedScalar(from: start.origin.x, to: end.origin.x, progress: progress),
+            y: interpolatedScalar(from: start.origin.y, to: end.origin.y, progress: progress),
+            width: interpolatedScalar(from: start.size.width, to: end.size.width, progress: progress),
+            height: interpolatedScalar(from: start.size.height, to: end.size.height, progress: progress)
+        )
+    }
+
+    private func interpolatedScalar(from start: CGFloat, to end: CGFloat, progress: CGFloat) -> CGFloat {
+        start + (end - start) * progress
     }
 }
