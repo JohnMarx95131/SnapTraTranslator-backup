@@ -259,7 +259,7 @@ struct DictionarySettingsView: View {
 
         var title: String {
             switch self {
-            case .dictionary: return L("Dictionary")
+            case .dictionary: return L("Word")
             case .sentence: return L("Sentence")
             case .wordPronunciation: return L("Word Pronunciation")
             case .sentencePronunciation: return L("Sentence Pronunciation")
@@ -279,7 +279,7 @@ struct DictionarySettingsView: View {
     var body: some View {
         HStack(spacing: 0) {
             leftSidebar
-                .frame(width: 160)
+                .frame(width: 190)
 
             Divider()
 
