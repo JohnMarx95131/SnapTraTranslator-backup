@@ -162,7 +162,6 @@ struct DictionarySource: Identifiable, Codable, Equatable {
     enum SourceType: String, Codable {
         case system    // macOS system dictionary
         case ecdict    // ECDICT offline dictionary
-        case freeDict  // Free Dictionary API
         case google
         case bing
         case youdao
@@ -181,8 +180,6 @@ extension DictionarySource.SourceType {
             return L("Advanced Dictionary")
         case .system:
             return L("System Dictionary")
-        case .freeDict:
-            return L("Free Dictionary")
         case .google:
             return L("Google Translate")
         case .bing:
@@ -200,8 +197,6 @@ extension DictionarySource.SourceType {
             return L("Advanced offline dictionary")
         case .system:
             return L("macOS built-in dictionary")
-        case .freeDict:
-            return L("Free English dictionary with phonetics")
         case .google:
             return L("Google web translation")
         case .bing:
@@ -219,7 +214,7 @@ extension DictionarySource.SourceType {
 
     var isOnline: Bool {
         switch self {
-        case .google, .bing, .youdao, .deepl, .freeDict:
+        case .google, .bing, .youdao, .deepl:
             return true
         case .system, .ecdict:
             return false
@@ -446,20 +441,6 @@ struct DictionarySettingsView: View {
             .padding(.top)
 
             VStack(spacing: 6) {
-                HStack(spacing: 12) {
-                    Text(L("Select"))
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 24)
-                    Spacer()
-                    Text(L("Latency"))
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 60, alignment: .trailing)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 4)
-
                 ForEach(TTSProvider.allCases) { provider in
                     TTSServiceRow(
                         provider: provider,
@@ -520,20 +501,6 @@ struct DictionarySettingsView: View {
             .padding(.top)
 
             VStack(spacing: 6) {
-                HStack(spacing: 12) {
-                    Text(L("Select"))
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 24)
-                    Spacer()
-                    Text(L("Latency"))
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 60, alignment: .trailing)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 4)
-
                 ForEach(TTSProvider.allCases) { provider in
                     TTSServiceRow(
                         provider: provider,
@@ -683,7 +650,7 @@ struct DictionarySettingsView: View {
         switch type {
         case .ecdict:
             return convertState(model.dictionaryDownload.state)
-        case .system, .freeDict, .google, .bing, .youdao, .deepl:
+        case .system, .google, .bing, .youdao, .deepl:
             return nil
         }
     }
@@ -702,7 +669,7 @@ struct DictionarySettingsView: View {
         switch type {
         case .ecdict:
             model.dictionaryDownload.startDownload()
-        case .system, .freeDict, .google, .bing, .youdao, .deepl:
+        case .system, .google, .bing, .youdao, .deepl:
             break
         }
     }
@@ -711,7 +678,7 @@ struct DictionarySettingsView: View {
         switch type {
         case .ecdict:
             model.dictionaryDownload.cancelDownload()
-        case .system, .freeDict, .google, .bing, .youdao, .deepl:
+        case .system, .google, .bing, .youdao, .deepl:
             break
         }
     }
@@ -720,7 +687,7 @@ struct DictionarySettingsView: View {
         switch type {
         case .ecdict:
             model.dictionaryDownload.delete()
-        case .system, .freeDict, .google, .bing, .youdao, .deepl:
+        case .system, .google, .bing, .youdao, .deepl:
             break
         }
     }
@@ -729,7 +696,7 @@ struct DictionarySettingsView: View {
         switch type {
         case .ecdict:
             model.dictionaryDownload.retry()
-        case .system, .freeDict, .google, .bing, .youdao, .deepl:
+        case .system, .google, .bing, .youdao, .deepl:
             break
         }
     }
@@ -1071,10 +1038,6 @@ struct IntegratedDictionaryRow: View {
             Image(systemName: "text.book.closed")
                 .font(.system(size: 16))
                 .foregroundStyle(.secondary)
-        case .freeDict:
-            Image(systemName: "globe")
-                .font(.system(size: 16))
-                .foregroundStyle(.orange)
         case .google:
             Image("TTSGoogle")
                 .resizable()

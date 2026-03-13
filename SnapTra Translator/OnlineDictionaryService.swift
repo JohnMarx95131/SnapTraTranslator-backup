@@ -6,7 +6,6 @@ import WebKit
 final class OnlineDictionaryService {
     private let session: URLSession
     private let logger = Logger(subsystem: "com.yelog.SnapTra-Translator", category: "OnlineDictionary")
-    private let freeDictionaryService = FreeDictionaryService()
 
     init(session: URLSession = OnlineDictionaryService.makeSession()) {
         self.session = session
@@ -35,8 +34,6 @@ final class OnlineDictionaryService {
                 return try await lookupYoudao(trimmedWord, sourceLanguage: sourceLanguage, targetLanguage: targetLanguage)
             case .deepl:
                 return try await lookupDeepL(trimmedWord, sourceLanguage: sourceLanguage, targetLanguage: targetLanguage)
-            case .freeDict:
-                return await freeDictionaryService.lookup(trimmedWord)
             case .system, .ecdict:
                 return nil
             }

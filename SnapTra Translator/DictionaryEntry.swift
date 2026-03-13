@@ -5,7 +5,6 @@ struct DictionaryEntry: Equatable {
     enum Source: Equatable {
         case advancedDictionary  // ECDICT
         case systemDictionary    // macOS system dictionary
-        case freeDictionary      // Free Dictionary API (dictionaryapi.dev)
         case googleTranslate
         case bingDictionary
         case youdaoDictionary

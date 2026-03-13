@@ -255,7 +255,6 @@ final class SettingsStore: ObservableObject {
         [
             makeDictionarySource(type: .ecdict, isEnabled: ecdictInstalled),
             makeDictionarySource(type: .system, isEnabled: true),
-            makeDictionarySource(type: .freeDict, isEnabled: true),
         ]
     }
 
@@ -264,13 +263,7 @@ final class SettingsStore: ObservableObject {
 
         let filtered = sources.filter { !hiddenTypes.contains($0.type) }
 
-        // Add freeDict if not present
-        var result = filtered
-        if !result.contains(where: { $0.type == .freeDict }) {
-            result.append(makeDictionarySource(type: .freeDict, isEnabled: true))
-        }
-
-        let migrated: [DictionarySource] = result.map {
+        let migrated: [DictionarySource] = filtered.map {
             DictionarySource(
                 id: $0.id,
                 name: $0.type.displayName,
