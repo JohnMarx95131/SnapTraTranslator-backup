@@ -20,9 +20,10 @@ extension Notification.Name {
 }
 
 enum SettingsWindowLayout {
-    static let defaultContentWidth: CGFloat = 470
+    static let defaultContentWidth: CGFloat = 390
+    static let aboutContentWidth: CGFloat = 420
     static let dictionaryContentWidth: CGFloat = 650
-    static let generalContentHeight: CGFloat = 620
+    static let generalContentHeight: CGFloat = 630
     static let dictionaryContentHeight: CGFloat = 550
     static let aboutContentHeight: CGFloat = 520
     static let outerPadding: CGFloat = 16
@@ -32,6 +33,8 @@ enum SettingsWindowLayout {
         switch tab {
         case .service:
             return dictionaryContentWidth
+        case .about:
+            return aboutContentWidth
         default:
             return defaultContentWidth
         }
