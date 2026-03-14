@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release
 
+## [1.3.3] - 2026-03-14
+
+### Added
+- integrate Sparkle for automatic in-app updates
+- support different update channels for GitHub vs App Store
+
+### Fixed
+- correct App Store URL and ID for update check
+
 ## [1.3.2] - 2026-03-13
 
 ### Changed
