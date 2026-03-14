@@ -286,16 +286,6 @@ struct GeneralSettingsView: View {
                         .padding(.horizontal, 14)
                         .opacity(0.5)
 
-                    ToggleRow(
-                        title: L("Debug OCR Region"),
-                        subtitle: L("Show capture area when shortcut is pressed"),
-                        isOn: $model.settings.debugShowOcrRegion
-                    )
-
-                    Divider()
-                        .padding(.horizontal, 14)
-                        .opacity(0.5)
-
                     if #available(macOS 15.0, *) {
                         GeneralTranslationLanguageRow(
                             targetLanguage: $model.settings.targetLanguage,
@@ -374,6 +364,16 @@ struct GeneralSettingsView: View {
                         title: L("Enable Sentence Translation"),
                         subtitle: L("Double-click %@ to translate the paragraph under cursor", model.settings.hotkeyDisplayText),
                         isOn: $model.settings.sentenceTranslationEnabled
+                    )
+
+                    Divider()
+                        .padding(.horizontal, 14)
+                        .opacity(0.5)
+
+                    ToggleRow(
+                        title: L("Debug OCR Region"),
+                        subtitle: L("Show capture area when shortcut is pressed"),
+                        isOn: $model.settings.debugShowOcrRegion
                     )
 
                     Divider()

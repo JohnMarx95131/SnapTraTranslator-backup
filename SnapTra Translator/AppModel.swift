@@ -315,6 +315,10 @@ final class AppModel: ObservableObject {
         guard isHotkeyActive else { return }
         guard settings.sentenceTranslationEnabled else { return }
         guard permissions.status.screenRecording else { return }
+        if settings.debugShowOcrRegion {
+            settings.debugShowOcrRegion = false
+            debugOverlayWindowController.hide()
+        }
         activeLookupMode = .paragraph
         stopMouseTracking()
         let mouseLocation = NSEvent.mouseLocation
