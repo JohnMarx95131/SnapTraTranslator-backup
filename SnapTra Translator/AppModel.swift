@@ -314,7 +314,7 @@ final class AppModel: ObservableObject {
     func handleHotkeyDoubleTap() {
         guard isHotkeyActive else { return }
         guard settings.sentenceTranslationEnabled else { return }
-        // 保持 isHotkeyActive = true，让释放事件能正常处理
+        guard permissions.status.screenRecording else { return }
         activeLookupMode = .paragraph
         stopMouseTracking()
         let mouseLocation = NSEvent.mouseLocation
