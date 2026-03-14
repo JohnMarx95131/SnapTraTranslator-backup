@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release
 
+## [1.3.4-beta.1] - 2026-03-14
+
+### Fixed
+- improve distribution channel detection and always init Sparkle
+- correct sparkle:edPublicKey position in appcast files
+
 ## [1.3.4-beta.0] - 2026-03-14
 
 ### Added
