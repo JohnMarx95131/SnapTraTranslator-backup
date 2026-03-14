@@ -42,7 +42,14 @@ fi
 
 echo "==> Built app found at $APP_PATH"
 
-# Step 4: Code sign the .app bundle (CI only, must happen BEFORE creating DMG)
+# Step 4: Add distribution channel marker for GitHub releases
+if [ "${DISTRIBUTION_CHANNEL:-}" = "github" ]; then
+    echo "==> Adding GitHub distribution marker to Info.plist"
+    /usr/libexec/PlistBuddy -c "Add :DISTRIBUTION_CHANNEL string 'github'" "$APP_PATH/Contents/Info.plist" 2>/dev/null || \
+    /usr/libexec/PlistBuddy -c "Set :DISTRIBUTION_CHANNEL 'github'" "$APP_PATH/Contents/Info.plist"
+fi
+
+# Step 5: Code sign the .app bundle (CI only, must happen BEFORE creating DMG)
 if [ "${CODESIGN_ENABLED:-}" = "1" ]; then
     echo "==> Running code signing on .app bundle..."
     bash "$SCRIPT_DIR/codesign-and-notarize.sh" sign "$APP_PATH"
@@ -50,7 +57,7 @@ else
     echo "==> Skipping code signing (set CODESIGN_ENABLED=1 to enable)"
 fi
 
-# Step 5: Package as .dmg (from the signed .app)
+# Step 6: Package as .dmg (from the signed .app)
 DMG_NAME="SnapTra-Translator-${VERSION}.dmg"
 DMG_PATH="$DIST_DIR/$DMG_NAME"
 DMG_STAGING="$DIST_DIR/.dmg-staging"
@@ -73,13 +80,13 @@ rm -rf "$DMG_STAGING"
 
 echo "==> DMG created at: $DMG_PATH"
 
-# Step 6: Sign DMG and notarize (CI only)
+# Step 7: Sign DMG and notarize (CI only)
 if [ "${CODESIGN_ENABLED:-}" = "1" ]; then
     echo "==> Signing DMG and submitting for notarization..."
     bash "$SCRIPT_DIR/codesign-and-notarize.sh" notarize "$DMG_PATH"
 fi
 
-# Step 7: Compute SHA-256 (must be after signing, since stapler modifies the DMG)
+# Step 8: Compute SHA-256 (must be after signing, since stapler modifies the DMG)
 SHA256=$(shasum -a 256 "$DMG_PATH" | awk '{print $1}')
 echo "$SHA256  $DMG_NAME" > "$DIST_DIR/$DMG_NAME.sha256"
 echo "==> SHA-256: $SHA256"

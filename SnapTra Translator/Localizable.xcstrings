@@ -465,6 +465,52 @@
         }
       }
     },
+    "Auto-update failed. You can download the latest version from GitHub." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-update failed. You can download the latest version from GitHub."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动更新失败，您可以从 GitHub 手动下载最新版本。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動更新失敗，您可以從 GitHub 手動下載最新版本。"
+          }
+        }
+      }
+    },
+    "Auto-updater is not available. Please visit GitHub to download the latest version." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-updater is not available. Please visit GitHub to download the latest version."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动更新器不可用，请前往 GitHub 下载最新版本。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動更新器不可用，請前往 GitHub 下載最新版本。"
+          }
+        }
+      }
+    },
     "Behavior" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -560,6 +606,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "音質最佳，基於 WebSocket"
+          }
+        }
+      }
+    },
+    "Beta" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beta"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "测试版"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "測試版"
           }
         }
       }
@@ -861,6 +930,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "檢查更新"
+          }
+        }
+      }
+    },
+    "Check for Updates..." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for Updates..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "检查更新..."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檢查更新..."
           }
         }
       }
@@ -1641,6 +1733,29 @@
         }
       }
     },
+    "Download from GitHub" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download from GitHub"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前往 GitHub 下载"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前往 GitHub 下載"
+          }
+        }
+      }
+    },
     "Drag the handle to reorder lookup priority. The first enabled dictionary will be queried first." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2318,6 +2433,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Deutsch"
+          }
+        }
+      }
+    },
+    "Go to GitHub" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go to GitHub"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前往 GitHub"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前往 GitHub"
           }
         }
       }
@@ -4527,6 +4665,52 @@
         }
       }
     },
+    "Receive beta releases for early access to new features" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receive beta releases for early access to new features"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接收测试版以提前体验新功能"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接收測試版以提前體驗新功能"
+          }
+        }
+      }
+    },
+    "Receive stable releases only" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receive stable releases only"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅接收稳定版"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "僅接收穩定版"
+          }
+        }
+      }
+    },
     "Refresh" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5693,6 +5877,29 @@
         }
       }
     },
+    "Stable" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stable"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "稳定版"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "穩定版"
+          }
+        }
+      }
+    },
     "Star on GitHub" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -6442,6 +6649,29 @@
         }
       }
     },
+    "Update Check Failed" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Check Failed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "检查更新失败"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檢查更新失敗"
+          }
+        }
+      }
+    },
     "Used first for English word lookups. Translation still uses Apple Translation." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -6898,226 +7128,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在識別滑鼠所在的英文段落"
-          }
-        }
-      }
-    },
-    "Auto-update failed. You can download the latest version from GitHub." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto-update failed. You can download the latest version from GitHub."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自动更新失败，您可以从 GitHub 手动下载最新版本。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自動更新失敗，您可以從 GitHub 手動下載最新版本。"
-          }
-        }
-      }
-    },
-    "Auto-updater is not available. Please visit GitHub to download the latest version." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto-updater is not available. Please visit GitHub to download the latest version."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自动更新器不可用，请前往 GitHub 下载最新版本。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自動更新器不可用，請前往 GitHub 下載最新版本。"
-          }
-        }
-      }
-    },
-    "Beta" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beta"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "测试版"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "測試版"
-          }
-        }
-      }
-    },
-    "Check for Updates..." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check for Updates..."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "检查更新..."
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "檢查更新..."
-          }
-        }
-      }
-    },
-    "Download from GitHub" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download from GitHub"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "前往 GitHub 下载"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "前往 GitHub 下載"
-          }
-        }
-      }
-    },
-    "Go to GitHub" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Go to GitHub"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "前往 GitHub"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "前往 GitHub"
-          }
-        }
-      }
-    },
-    "Receive beta releases for early access to new features" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Receive beta releases for early access to new features"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "接收测试版以提前体验新功能"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "接收測試版以提前體驗新功能"
-          }
-        }
-      }
-    },
-    "Receive stable releases only" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Receive stable releases only"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "仅接收稳定版"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "僅接收穩定版"
-          }
-        }
-      }
-    },
-    "Stable" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stable"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "稳定版"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "穩定版"
-          }
-        }
-      }
-    },
-    "Update Check Failed" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update Check Failed"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "检查更新失败"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "檢查更新失敗"
           }
         }
       }

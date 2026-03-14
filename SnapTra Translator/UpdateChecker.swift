@@ -2,6 +2,25 @@ import AppKit
 import Foundation
 import Sparkle
 
+enum DistributionChannel {
+    case github
+    case appStore
+
+    static var current: DistributionChannel {
+        if let _ = Bundle.main.appStoreReceiptURL?.path,
+           Bundle.main.appStoreReceiptURL?.path.isEmpty == false {
+            return .appStore
+        }
+
+        if let channel = Bundle.main.infoDictionary?["DISTRIBUTION_CHANNEL"] as? String,
+           channel == "github" {
+            return .github
+        }
+
+        return .github
+    }
+}
+
 @MainActor
 final class UpdateChecker: NSObject, SPUUpdaterDelegate {
     static let shared = UpdateChecker()
@@ -10,11 +29,16 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
     private let checkInterval: TimeInterval = 24 * 60 * 60
     private var autoCheckTimer: Timer?
 
+    var isAppStore: Bool {
+        DistributionChannel.current == .appStore
+    }
+
     private override init() {
         super.init()
     }
 
     func initialize() {
+        guard !isAppStore else { return }
         guard updaterController == nil else { return }
 
         updaterController = SPUStandardUpdaterController(
@@ -34,6 +58,7 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
     }
 
     func startAutoCheckIfNeeded() {
+        guard !isAppStore else { return }
         guard SettingsStore.shared.autoCheckUpdates else { return }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
@@ -49,6 +74,12 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
     }
 
     func checkForUpdates(silent: Bool = false) {
+        if isAppStore {
+            guard !silent else { return }
+            openAppStore()
+            return
+        }
+
         guard let controller = updaterController else {
             if !silent {
                 showManualUpdateAlert()
@@ -64,7 +95,21 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
     }
 
     func checkForUpdatesWithUI() {
+        if isAppStore {
+            openAppStore()
+            return
+        }
+
         updaterController?.checkForUpdates(nil)
+    }
+
+    // MARK: - App Store
+
+    private func openAppStore() {
+        let appStoreID = "6739151165"
+        if let url = URL(string: "macappstore://apps.apple.com/app/id\(appStoreID)") {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     // MARK: - SPUUpdaterDelegate
