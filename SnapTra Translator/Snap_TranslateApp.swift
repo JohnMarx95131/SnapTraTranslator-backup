@@ -197,6 +197,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         )
         continuousItem.target = self
         menu.addItem(continuousItem)
+        self.continuousTranslationMenuItem = continuousItem
 
         // Pronunciation submenu
         let pronunciationSubmenu = NSMenu()
