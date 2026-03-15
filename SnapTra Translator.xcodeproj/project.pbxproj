@@ -419,6 +419,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSScreenCaptureUsageDescription = "SnapTra Translator needs screen recording to detect words under the cursor.";
+				INFOPLIST_KEY_SUPublicEDKey = "OJo/oEqSjtmok1HYx+XgFHLq1FkUAJs8hsDms0+Uv98=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -458,6 +459,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSScreenCaptureUsageDescription = "SnapTra Translator needs screen recording to detect words under the cursor.";
+				INFOPLIST_KEY_SUPublicEDKey = "OJo/oEqSjtmok1HYx+XgFHLq1FkUAJs8hsDms0+Uv98=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
