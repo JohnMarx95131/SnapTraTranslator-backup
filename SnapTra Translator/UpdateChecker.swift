@@ -31,7 +31,9 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
     var isGitHubRelease: Bool {
         #if DEBUG
         // Debug mode: allow forcing GitHub release mode for testing
-        if SettingsStore.shared.debugShowChannelSelector {
+        // 直接从 UserDefaults 读取，确保能获取最新值
+        let debugEnabled = UserDefaults.standard.bool(forKey: AppSettingKey.debugShowChannelSelector)
+        if debugEnabled {
             return true
         }
         #endif
@@ -59,6 +61,9 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
 
     func updateFeedURL() {
         updaterController?.updater.clearFeedURLFromUserDefaults()
+        // Force Sparkle to reload the feed URL by resetting the updater's feed URL
+        // This ensures the delegate method is called again on next check
+        updaterController?.updater.setFeedURL(nil)
     }
 
     func startAutoCheckIfNeeded() {
