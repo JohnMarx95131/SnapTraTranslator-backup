@@ -152,12 +152,12 @@ struct SettingsWindowView: View {
             updateTabScrollIndicator(for: selectedTab, animated: false)
             resizeWindow(for: selectedTab, animated: false)
         }
-        .onChange(of: selectedTab) { newValue in
+        .onChange(of: selectedTab) { _, newValue in
             updateTabScrollIndicator(for: newValue, animated: true)
             resizeWindow(for: newValue, animated: true)
         }
         #if DEBUG
-        .onChange(of: model.settings.debugShowChannelSelector) { _ in
+        .onChange(of: model.settings.debugShowChannelSelector) { _, _ in
             // When debugShowChannelSelector changes, resize window if on About tab
             if selectedTab == .about {
                 resizeWindowWithCurrentHeight(animated: true)

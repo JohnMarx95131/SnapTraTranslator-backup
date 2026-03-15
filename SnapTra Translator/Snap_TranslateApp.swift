@@ -444,13 +444,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     private func scheduleVisibilityUpdate() {
         visibilityTask?.cancel()
         visibilityTask = Task { [weak self] in
-            guard let self else { return }
-            await self.updateVisibilityFromCurrentState()
+            await self?.updateVisibilityFromCurrentState()
         }
     }
 
+    @MainActor
     private func updateVisibilityFromCurrentState() async {
-        var needsSettings = !(await model.permissions.status.screenRecording)
+        var needsSettings = !model.permissions.status.screenRecording
 
         if #available(macOS 15.0, *) {
             let status = await model.languagePackManager?.checkLanguagePairQuiet(
@@ -465,11 +465,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         }
 
         if needsSettings {
-            await showSettingsWindow()
+            showSettingsWindow()
         } else if shouldShowWindowAfterPermissionGrant {
             shouldShowWindowAfterPermissionGrant = false
             isManualWindowOpen = true
-            await showSettingsWindow()
+            showSettingsWindow()
         } else if !isManualWindowOpen {
             hideDockIcon()
         }
@@ -500,18 +500,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
 
     @MainActor
     private func refreshSettingsWindowSize() {
-        // Refresh settings window size when debugShowChannelSelector changes
         guard let window = settingsWindow, window.isVisible else { return }
         
-        // Get current tab
-        if let hostingView = window.contentView as? NSHostingView<SettingsWindowView> {
-            // The view will automatically resize based on the new debugShowChannelSelector value
-            // because SettingsWindowLayout.contentHeight(for:) checks this value
-            // Force window to update its size by recreating the window controller
-            let currentTab: SettingsTab
-            // Access the current tab through the view's state
-            // Since we can't easily access @State, we'll just close and reopen the window
-            // which will use the new size
+        if window.contentView is NSHostingView<SettingsWindowView> {
             settingsWindowController?.close()
             settingsWindowController = nil
             showSettingsWindow(initialTab: .about)

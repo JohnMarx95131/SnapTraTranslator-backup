@@ -67,20 +67,14 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate, ObservableObject {
     func updateFeedURL() {
         guard let updater = updaterController?.updater else { return }
         
-        // 清除 Sparkle 的 feed URL 缓存
         updater.clearFeedURLFromUserDefaults()
         
-        // 清除 Sparkle 的 appcast 缓存，强制重新下载
         let defaults = UserDefaults.standard
         let sparkleKeys = defaults.dictionaryRepresentation().keys.filter { $0.hasPrefix("SU") }
         for key in sparkleKeys {
             defaults.removeObject(forKey: key)
         }
         
-        // 重置 feed URL，强制 Sparkle 重新调用 feedURLString(for:)
-        updater.setFeedURL(nil)
-        
-        // 重置更新周期
         updater.resetUpdateCycle()
         
         print("[UpdateChecker] Feed URL updated, Sparkle cache cleared for channel: \(SettingsStore.shared.updateChannel)")

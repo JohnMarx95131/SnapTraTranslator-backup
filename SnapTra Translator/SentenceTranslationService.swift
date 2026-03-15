@@ -6,7 +6,7 @@
 //
 
 import AppKit
-import CommonCrypto
+import CryptoKit
 import Foundation
 import os.log
 import WebKit
@@ -355,10 +355,7 @@ final class SentenceTranslationService {
 
     private func md5Data(_ input: String) -> Data {
         let source = Data(input.utf8)
-        var digest = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
-        source.withUnsafeBytes { buffer in
-            _ = CC_MD5(buffer.baseAddress, CC_LONG(source.count), &digest)
-        }
+        let digest = Insecure.MD5.hash(data: source)
         return Data(digest)
     }
 

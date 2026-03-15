@@ -110,34 +110,33 @@ final class SpeechService {
             logger.debug("💾 Debug: Audio saved to \(debugURL.path)")
             #endif
             
-            try await MainActor.run {
-                guard !self.isCancelled else { return }
+            await MainActor.run { [weak self] in
+                guard let self, !self.isCancelled else { return }
                 
                 self.analyzeAudioData(audioData, provider: provider)
                 
                 do {
-                    audioPlayer = try AVAudioPlayer(data: audioData)
-                    audioPlayer?.prepareToPlay()
+                    self.audioPlayer = try AVAudioPlayer(data: audioData)
+                    self.audioPlayer?.prepareToPlay()
                     
-                    // Log audio player details
-                    if let player = audioPlayer {
-                        logger.info("🔊 Audio format: \(player.format)")
-                        logger.info("⏱️ Duration: \(player.duration) seconds")
-                        logger.info("🔢 Number of channels: \(player.numberOfChannels)")
+                    if let player = self.audioPlayer {
+                        self.logger.info("🔊 Audio format: \(player.format)")
+                        self.logger.info("⏱️ Duration: \(player.duration) seconds")
+                        self.logger.info("🔢 Number of channels: \(player.numberOfChannels)")
                     }
                     
-                    let success = audioPlayer?.play() ?? false
+                    let success = self.audioPlayer?.play() ?? false
                     if success {
-                        logger.info("▶️ Started playing audio")
+                        self.logger.info("▶️ Started playing audio")
                     } else {
-                        logger.error("❌ AVAudioPlayer.play() returned false")
-                        logger.error("📊 Audio data size: \(audioData.count) bytes")
+                        self.logger.error("❌ AVAudioPlayer.play() returned false")
+                        self.logger.error("📊 Audio data size: \(audioData.count) bytes")
                         self.speakWithApple(text, language: language)
                     }
                 } catch {
-                    logger.error("❌ Failed to create AVAudioPlayer: \(error)")
-                    logger.error("📊 Audio data size: \(audioData.count) bytes")
-                    logger.error("📄 First 20 bytes: \(audioData.prefix(20).map { String(format: "%02x", $0) }.joined(separator: " "))")
+                    self.logger.error("❌ Failed to create AVAudioPlayer: \(error)")
+                    self.logger.error("📊 Audio data size: \(audioData.count) bytes")
+                    self.logger.error("📄 First 20 bytes: \(audioData.prefix(20).map { String(format: "%02x", $0) }.joined(separator: " "))")
                     self.speakWithApple(text, language: language)
                 }
             }
