@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import Foundation
 import Sparkle
 
@@ -21,12 +22,16 @@ enum DistributionChannel {
 }
 
 @MainActor
-final class UpdateChecker: NSObject, SPUUpdaterDelegate {
+final class UpdateChecker: NSObject, SPUUpdaterDelegate, ObservableObject {
     static let shared = UpdateChecker()
 
     private var updaterController: SPUStandardUpdaterController?
     private let checkInterval: TimeInterval = 24 * 60 * 60
+    private let checkTimeout: TimeInterval = 60 // 检查超时时间 60 秒
     private var autoCheckTimer: Timer?
+    private var checkTimeoutTimer: Timer?
+
+    @Published var isCheckingForUpdates = false
 
     var isGitHubRelease: Bool {
         #if DEBUG
@@ -98,11 +103,17 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
     }
 
     func checkForUpdates(silent: Bool = false) {
+        guard !isCheckingForUpdates || silent else {
+            print("[UpdateChecker] Update check already in progress, skipping")
+            return
+        }
+
         if isGitHubRelease {
             if let controller = updaterController {
                 if silent {
                     controller.updater.checkForUpdatesInBackground()
                 } else {
+                    startUpdateCheck()
                     controller.checkForUpdates(nil)
                 }
             } else if !silent {
@@ -115,8 +126,14 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
     }
 
     func checkForUpdatesWithUI() {
+        guard !isCheckingForUpdates else {
+            print("[UpdateChecker] Update check already in progress, skipping")
+            return
+        }
+
         if isGitHubRelease {
             if let controller = updaterController {
+                startUpdateCheck()
                 controller.checkForUpdates(nil)
             } else {
                 showSparkleNotInitializedAlert()
@@ -124,6 +141,27 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
         } else {
             openAppStore()
         }
+    }
+
+    // MARK: - Update Check State Management
+
+    private func startUpdateCheck() {
+        isCheckingForUpdates = true
+
+        // 启动超时计时器，防止用户跳过版本或关闭窗口后状态卡住
+        checkTimeoutTimer?.invalidate()
+        checkTimeoutTimer = Timer.scheduledTimer(withTimeInterval: checkTimeout, repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.resetUpdateCheckState()
+                print("[UpdateChecker] Update check timed out after \(self?.checkTimeout ?? 0)s")
+            }
+        }
+    }
+
+    private func resetUpdateCheckState() {
+        isCheckingForUpdates = false
+        checkTimeoutTimer?.invalidate()
+        checkTimeoutTimer = nil
     }
 
     // MARK: - App Store
@@ -154,14 +192,17 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
 
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
         print("[UpdateChecker] Update found: \(item.displayVersionString)")
+        resetUpdateCheckState()
     }
 
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: Error) {
         print("[UpdateChecker] No update found")
+        resetUpdateCheckState()
     }
 
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
         print("[UpdateChecker] Update aborted with error: \(error.localizedDescription)")
+        resetUpdateCheckState()
 
         let nsError = error as NSError
         if nsError.domain == SUSparkleErrorDomain {

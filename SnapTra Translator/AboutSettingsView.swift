@@ -24,6 +24,7 @@ private func openAppStore() {
 
 struct AboutSettingsView: View {
     @EnvironmentObject var model: AppModel
+    @ObservedObject private var updateChecker = UpdateChecker.shared
     var hidesScrollIndicator: Bool = false
 
     #if DEBUG
@@ -100,14 +101,29 @@ struct AboutSettingsView: View {
                     checkForUpdates()
                 } label: {
                     HStack(spacing: 6) {
-                        Image(systemName: shouldShowChannelSelector ? "arrow.down.circle" : "sparkle")
-                            .font(.system(size: 12, weight: .medium))
-                        Text(shouldShowChannelSelector ? L("Check for GitHub Updates") : L("Check for Updates"))
+                        if updateChecker.isCheckingForUpdates {
+                            Image(systemName: "arrow.2.circlepath")
+                                .font(.system(size: 12, weight: .medium))
+                                .rotationEffect(.degrees(updateChecker.isCheckingForUpdates ? 360 : 0))
+                                .animation(
+                                    updateChecker.isCheckingForUpdates
+                                        ? Animation.linear(duration: 1).repeatForever(autoreverses: false)
+                                        : .default,
+                                    value: updateChecker.isCheckingForUpdates
+                                )
+                        } else {
+                            Image(systemName: shouldShowChannelSelector ? "arrow.down.circle" : "sparkle")
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                        Text(updateChecker.isCheckingForUpdates
+                             ? L("Checking for Updates...")
+                             : (shouldShowChannelSelector ? L("Check for GitHub Updates") : L("Check for Updates")))
                             .font(.system(size: 13, weight: .medium))
                     }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.regular)
+                .disabled(updateChecker.isCheckingForUpdates)
 
                 // Copyright
                 Text("© 2025 yelog. All rights reserved.")
