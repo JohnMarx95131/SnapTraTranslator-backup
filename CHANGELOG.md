@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release
 
+## [1.3.4-beta.4] - 2026-03-15
+
+### Fixed
+- 下拉菜单中连续翻译选项不显示勾选状态的问题
+- 切换更新频道后无法立即生效的问题
+- debug模式下检查更新通道选择器不生效的问题
+
 ## [1.3.4-beta.3] - 2026-03-15
 
 ### Added
