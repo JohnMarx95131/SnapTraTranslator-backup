@@ -31,7 +31,49 @@ cmd_sign() {
         for framework in "$APP_DIR/Contents/Frameworks"/*.framework; do
             if [ -d "$framework" ]; then
                 echo "==> Signing embedded framework: $(basename "$framework")"
-                # Preserve nested helper signatures inside frameworks such as Sparkle.
+                # Sign all nested binaries inside the framework first
+                # This is required for Sparkle's XPC services and helper apps
+                find "$framework" -type f \( -name "*.xpc" -o -name "Updater" -o -name "Autoupdate" \) 2>/dev/null | while read -r xpc_or_binary; do
+                    if [ -d "$xpc_or_binary" ]; then
+                        # XPC service bundle
+                        echo "  -> Signing XPC service: $(basename "$xpc_or_binary")"
+                        codesign --force --options runtime \
+                            --sign "$SIGNING_IDENTITY" \
+                            --timestamp \
+                            "$xpc_or_binary"
+                    fi
+                done
+                # Sign XPC services (they are directories)
+                for xpc in "$framework"/Versions/*/XPCServices/*.xpc "$framework"/XPCServices/*.xpc; do
+                    if [ -d "$xpc" ]; then
+                        echo "  -> Signing XPC service: $(basename "$xpc")"
+                        codesign --force --options runtime \
+                            --sign "$SIGNING_IDENTITY" \
+                            --timestamp \
+                            "$xpc"
+                    fi
+                done
+                # Sign Updater.app if present
+                for updater_app in "$framework"/Versions/*/Resources/Updater.app "$framework"/Resources/Updater.app; do
+                    if [ -d "$updater_app" ]; then
+                        echo "  -> Signing Updater.app"
+                        codesign --force --options runtime \
+                            --sign "$SIGNING_IDENTITY" \
+                            --timestamp \
+                            "$updater_app"
+                    fi
+                done
+                # Sign Autoupdate binary if present
+                for autoupdate in "$framework"/Versions/*/Resources/Autoupdate "$framework"/Resources/Autoupdate; do
+                    if [ -f "$autoupdate" ]; then
+                        echo "  -> Signing Autoupdate binary"
+                        codesign --force --options runtime \
+                            --sign "$SIGNING_IDENTITY" \
+                            --timestamp \
+                            "$autoupdate"
+                    fi
+                done
+                # Finally sign the framework bundle
                 codesign --force --options runtime \
                     --sign "$SIGNING_IDENTITY" \
                     --timestamp \
