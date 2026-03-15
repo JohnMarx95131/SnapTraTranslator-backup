@@ -29,7 +29,13 @@ final class UpdateChecker: NSObject, SPUUpdaterDelegate {
     private var autoCheckTimer: Timer?
 
     var isGitHubRelease: Bool {
-        DistributionChannel.isGitHubRelease
+        #if DEBUG
+        // Debug mode: allow forcing GitHub release mode for testing
+        if SettingsStore.shared.debugShowChannelSelector {
+            return true
+        }
+        #endif
+        return DistributionChannel.isGitHubRelease
     }
 
     private override init() {

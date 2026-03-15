@@ -26,6 +26,13 @@ struct AboutSettingsView: View {
     @EnvironmentObject var model: AppModel
     var hidesScrollIndicator: Bool = false
 
+    #if DEBUG
+    // Access debugShowChannelSelector to make SwiftUI re-render when it changes
+    private var showChannelSelector: Bool {
+        model.settings.debugShowChannelSelector
+    }
+    #endif
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {

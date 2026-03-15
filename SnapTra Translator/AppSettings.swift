@@ -140,6 +140,7 @@ enum AppSettingKey {
     static let sentenceTranslationEnabled = "sentenceTranslationEnabled"
     static let autoCheckUpdates = "autoCheckUpdates"
     static let updateChannel = "updateChannel"
+    static let debugShowChannelSelector = "debugShowChannelSelector"
 }
 
 enum EnglishAccent: String, CaseIterable, Identifiable {

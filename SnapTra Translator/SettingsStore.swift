@@ -124,6 +124,15 @@ final class SettingsStore: ObservableObject {
             UpdateChecker.shared.updateFeedURL()
         }
     }
+    
+    #if DEBUG
+    /// Debug mode: force show update channel selector for testing
+    @Published var debugShowChannelSelector: Bool {
+        didSet {
+            defaults.set(debugShowChannelSelector, forKey: AppSettingKey.debugShowChannelSelector)
+        }
+    }
+    #endif
 
     private let defaults: UserDefaults
     private static let dictionarySourcesKey = "dictionarySources"
@@ -209,6 +218,12 @@ final class SettingsStore: ObservableObject {
 
         let updateChannelValue = defaults.string(forKey: AppSettingKey.updateChannel)
         updateChannel = UpdateChannel(rawValue: updateChannelValue ?? "stable") ?? .stable
+        
+        #if DEBUG
+        // Load debug settings (default to false)
+        let debugShowChannelSelectorValue = defaults.object(forKey: AppSettingKey.debugShowChannelSelector) as? Bool
+        debugShowChannelSelector = debugShowChannelSelectorValue ?? false
+        #endif
     }
 
     private static func loadOrMigrateDictionarySources(defaults: UserDefaults) -> [DictionarySource] {

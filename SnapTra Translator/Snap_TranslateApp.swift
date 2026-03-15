@@ -49,6 +49,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     private weak var sentencePronunciationMenuItem: NSMenuItem?
     private weak var continuousTranslationMenuItem: NSMenuItem?
     private weak var providerInfoMenuItem: NSMenuItem?
+    #if DEBUG
+    private weak var debugShowChannelMenuItem: NSMenuItem?
+    #endif
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         guard !isRunningTests else { return }
@@ -106,6 +109,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
                 }
             }
             .store(in: &cancellables)
+
+        #if DEBUG
+        // Listen for debugShowChannelSelector changes to refresh settings window size
+        model.settings.$debugShowChannelSelector
+            .dropFirst()
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    self?.refreshSettingsWindowSize()
+                }
+            }
+            .store(in: &cancellables)
+        #endif
 
         // Initialize localization manager with saved language
         LocalizationManager.shared.setLanguage(model.settings.appLanguage)
@@ -252,6 +267,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         checkUpdatesItem.target = self
         menu.addItem(checkUpdatesItem)
 
+        #if DEBUG
+        // Debug section
+        menu.addItem(.separator())
+
+        // Debug: Show Update Channel Selector
+        let debugShowChannelItem = NSMenuItem(
+            title: "显示更新通道选择器",
+            action: #selector(toggleDebugShowChannelSelector),
+            keyEquivalent: ""
+        )
+        debugShowChannelItem.target = self
+        menu.addItem(debugShowChannelItem)
+        self.debugShowChannelMenuItem = debugShowChannelItem
+        #endif
+
         // Quit
         let quitItem = NSMenuItem(
             title: L("Quit"),
@@ -306,6 +336,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             string: providerTitle,
             attributes: attributes
         )
+        
+        #if DEBUG
+        // Update debug menu item state
+        debugShowChannelMenuItem?.state = model.settings.debugShowChannelSelector ? .on : .off
+        #endif
     }
 
     @MainActor private func updateMenuLanguage() {
@@ -455,6 +490,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         settingsWindow?.orderOut(nil)
         NSApp.setActivationPolicy(.accessory)
     }
+
+    #if DEBUG
+    @objc private func toggleDebugShowChannelSelector() {
+        model.settings.debugShowChannelSelector.toggle()
+        updateDynamicMenuItems()
+    }
+
+    @MainActor
+    private func refreshSettingsWindowSize() {
+        // Refresh settings window size when debugShowChannelSelector changes
+        guard let window = settingsWindow, window.isVisible else { return }
+        
+        // Get current tab
+        if let hostingView = window.contentView as? NSHostingView<SettingsWindowView> {
+            // The view will automatically resize based on the new debugShowChannelSelector value
+            // because SettingsWindowLayout.contentHeight(for:) checks this value
+            // Force window to update its size by recreating the window controller
+            let currentTab: SettingsTab
+            // Access the current tab through the view's state
+            // Since we can't easily access @State, we'll just close and reopen the window
+            // which will use the new size
+            settingsWindowController?.close()
+            settingsWindowController = nil
+            showSettingsWindow(initialTab: .about)
+        }
+    }
+    #endif
 
 }
 

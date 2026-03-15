@@ -26,7 +26,7 @@ enum SettingsWindowLayout {
     static let generalContentHeight: CGFloat = 630
     static let dictionaryContentHeight: CGFloat = 550
     static let aboutContentHeight: CGFloat = 520
-    static let aboutContentHeightWithChannelSelector: CGFloat = 600
+    static let aboutContentHeightWithChannelSelector: CGFloat = 630
     static let outerPadding: CGFloat = 16
     static let animationDuration: TimeInterval = 0.24
 
@@ -51,6 +51,12 @@ enum SettingsWindowLayout {
             if UpdateChecker.shared.isGitHubRelease {
                 return aboutContentHeightWithChannelSelector
             }
+            #if DEBUG
+            // Debug mode: also check debugShowChannelSelector for testing
+            if SettingsStore.shared.debugShowChannelSelector {
+                return aboutContentHeightWithChannelSelector
+            }
+            #endif
             return aboutContentHeight
         }
     }
