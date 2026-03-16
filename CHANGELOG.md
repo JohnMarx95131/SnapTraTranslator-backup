@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.4] - 2026-03-16
+
+### Added
+- add option to show/hide menu bar icon in settings
+- support macOS 14.0+ with graceful translation fallback
+- add update channel selector for GitHub releases (stable/beta)
+- jump to corresponding GitHub Release page based on update channel
+- improve update check button interaction experience
+
+### Changed
+- remove Check for Updates menu item from dropdown
+- rename debug menu item to 'GitHub Release'
+- fix compiler warnings and deprecated APIs
+
+### Fixed
+- correct Sparkle Updater.app and Autoupdate signing paths
+- sign Sparkle nested binaries for notarization
+- repair sandboxed sparkle release packaging
+- add SUPublicEDKey to fix Sparkle auto-update signature verification
+- align Sparkle feeds and GitHub build versioning
+- improve distribution channel detection and always init Sparkle
+- correct sparkle:edPublicKey position in appcast files
+- dropdown menu continuous translation option not showing checkmark state
+- update channel selector not taking effect immediately after toggle
+- relax OCR selection and merge split lines in paragraph mode
+- size paragraph text from actual panel width
+- only show update channel options for GitHub releases
+- move debug OCR option and auto-disable on sentence translation
+- prevent panel from showing without screen recording permission
+- increase about page height for GitHub releases
+
 ## [1.3.4-beta.11] - 2026-03-15
 
 ### Added
