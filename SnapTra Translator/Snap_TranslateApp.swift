@@ -101,6 +101,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             }
             .store(in: &cancellables)
 
+        model.settings.$showMenuBarIcon
+            .sink { [weak self] show in
+                Task { @MainActor in
+                    self?.updateStatusItemVisibility(show: show)
+                }
+            }
+            .store(in: &cancellables)
+
         // Listen for language changes to update menu
         NotificationCenter.default.publisher(for: .languageChanged)
             .sink { [weak self] _ in
@@ -161,21 +169,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     }
 
     @MainActor private func configureStatusItem() {
+        guard model.settings.showMenuBarIcon else { return }
+        
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         if let button = item.button {
             button.image = makeStatusBarImage()
             button.imagePosition = .imageOnly
             button.toolTip = "SnapTra Translator"
-            // Note: When using statusItem.menu, we don't need to set target/action
-            // The menu will be shown automatically when the button is clicked
         }
 
-        // Create and assign the menu
         let menu = createStatusBarMenu()
         item.menu = menu
 
         statusItem = item
+    }
+
+    @MainActor private func updateStatusItemVisibility(show: Bool) {
+        if show {
+            if statusItem == nil {
+                configureStatusItem()
+            }
+        } else {
+            if let item = statusItem {
+                NSStatusBar.system.removeStatusItem(item)
+                statusItem = nil
+            }
+        }
     }
 
     @MainActor private func createStatusBarMenu() -> NSMenu {

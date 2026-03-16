@@ -141,6 +141,7 @@ enum AppSettingKey {
     static let autoCheckUpdates = "autoCheckUpdates"
     static let updateChannel = "updateChannel"
     static let debugShowChannelSelector = "debugShowChannelSelector"
+    static let showMenuBarIcon = "showMenuBarIcon"
 }
 
 enum EnglishAccent: String, CaseIterable, Identifiable {

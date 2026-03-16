@@ -23,7 +23,7 @@ enum SettingsWindowLayout {
     static let defaultContentWidth: CGFloat = 400
     static let aboutContentWidth: CGFloat = 370
     static let dictionaryContentWidth: CGFloat = 650
-    static let generalContentHeight: CGFloat = 630
+    static let generalContentHeight: CGFloat = 680
     static let dictionaryContentHeight: CGFloat = 550
     static let aboutContentHeight: CGFloat = 520
     static let aboutContentHeightWithChannelSelector: CGFloat = 650
@@ -455,6 +455,16 @@ struct GeneralSettingsView: View {
                         title: L("Launch at Login"),
                         subtitle: L("Start automatically when you log in"),
                         isOn: $model.settings.launchAtLogin
+                    )
+
+                    Divider()
+                        .padding(.horizontal, 14)
+                        .opacity(0.5)
+
+                    ToggleRow(
+                        title: L("Show Menu Bar Icon"),
+                        subtitle: L("Display app icon in the status bar"),
+                        isOn: $model.settings.showMenuBarIcon
                     )
 
                     Divider()
