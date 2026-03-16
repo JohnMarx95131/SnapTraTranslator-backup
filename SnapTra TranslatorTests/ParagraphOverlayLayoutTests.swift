@@ -79,58 +79,56 @@ final class ParagraphOverlayLayoutTests: XCTestCase {
         XCTAssertEqual(style.headIndent, 0, accuracy: 0.001)
     }
 
-    func testParagraphFontSizingUsesActualContainerWidth() {
-        let sample = ParagraphFontSizingSample(
-            text: "• Instant OCR translation - Captures screen region around cursor and detects the word closest to your pointer",
-            weight: .medium
-        )
-        let measuredWidth = ParagraphFontSizing.maximumLineWidth(
-            for: sample.text,
-            font: .systemFont(ofSize: ParagraphFontSizing.baseFontSize, weight: sample.weight)
-        )
-
-        let narrowFontSize = ParagraphFontSizing.optimalFontSize(
-            for: [sample],
+    func testParagraphFontSizingAllowsLimitedUpsizingFromPreferredSize() {
+        let fontSize = ParagraphFontSizing.optimalFontSize(
+            preferredFontSize: 14,
+            originalText: "Master Plan",
             containerWidth: 520,
             horizontalPadding: 18
         )
-        let wideFontSize = ParagraphFontSizing.optimalFontSize(
-            for: [sample],
-            containerWidth: measuredWidth * 2 + 36,
-            horizontalPadding: 18
-        )
 
-        XCTAssertGreaterThan(wideFontSize, narrowFontSize)
-        XCTAssertGreaterThan(wideFontSize, 20)
+        XCTAssertEqual(
+            fontSize,
+            min(14 * ParagraphFontSizing.preferredUpscaleFactor, ParagraphFontSizing.maxFontSize),
+            accuracy: 0.01
+        )
     }
 
-    func testParagraphFontSizingUsesLongestReadyTranslationLine() {
-        let original = ParagraphFontSizingSample(
-            text: "Short source line",
-            weight: .medium
+    func testParagraphFontSizingKeepsOriginalLongestLineWithinAvailableWidth() {
+        let originalText = "This original line should cap the display size before it wraps in the panel"
+        let targetFontSize = min(18 * ParagraphFontSizing.preferredUpscaleFactor, ParagraphFontSizing.maxFontSize)
+        let targetWidth = ParagraphFontSizing.maximumLineWidth(
+            for: originalText,
+            font: .systemFont(ofSize: targetFontSize, weight: .medium)
         )
-        let translation = ParagraphFontSizingSample(
-            text: "Translated output becomes the limiting line because it is substantially longer than the source content",
-            weight: .semibold
-        )
-        let translationWidth = ParagraphFontSizing.maximumLineWidth(
-            for: translation.text,
-            font: .systemFont(ofSize: ParagraphFontSizing.baseFontSize, weight: translation.weight)
-        )
-        let containerWidth = translationWidth + 36
+        let availableWidth = floor(targetWidth * 0.7)
+        let containerWidth = availableWidth + 36
 
-        let originalOnlyFontSize = ParagraphFontSizing.optimalFontSize(
-            for: [original],
-            containerWidth: containerWidth,
-            horizontalPadding: 18
-        )
-        let sharedFontSize = ParagraphFontSizing.optimalFontSize(
-            for: [original, translation],
+        let fontSize = ParagraphFontSizing.optimalFontSize(
+            preferredFontSize: 18,
+            originalText: originalText,
             containerWidth: containerWidth,
             horizontalPadding: 18
         )
 
-        XCTAssertEqual(sharedFontSize, ParagraphFontSizing.baseFontSize, accuracy: 0.25)
-        XCTAssertLessThan(sharedFontSize, originalOnlyFontSize)
+        XCTAssertLessThan(fontSize, targetFontSize)
+
+        let measuredWidth = ParagraphFontSizing.maximumLineWidth(
+            for: originalText,
+            font: .systemFont(ofSize: fontSize, weight: .medium)
+        )
+        XCTAssertLessThanOrEqual(measuredWidth, availableWidth + 0.5)
+    }
+
+    func testParagraphFontSizingIgnoresTranslationLengthWhenUpsizingOriginalText() {
+        let shortOriginal = "Master Plan"
+        let fontSize = ParagraphFontSizing.optimalFontSize(
+            preferredFontSize: 14,
+            originalText: shortOriginal,
+            containerWidth: 520,
+            horizontalPadding: 18
+        )
+
+        XCTAssertGreaterThan(fontSize, 14)
     }
 }

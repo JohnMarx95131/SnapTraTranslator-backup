@@ -603,11 +603,22 @@ final class OCRService {
     }
 
     nonisolated private static func isLikelyEnglishParagraph(_ text: String) -> Bool {
-        let letters = text.unicodeScalars.filter { letterSet.contains($0) }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let letters = trimmed.unicodeScalars.filter { letterSet.contains($0) }
         guard letters.count >= 3 else {
             return false
         }
-        return true
+
+        if trimmed.contains("\n") {
+            return true
+        }
+
+        let wordCount = trimmed.split(whereSeparator: { !$0.isLetter }).count
+        if wordCount >= 2 {
+            return true
+        }
+
+        return letters.count >= 10
     }
 
     /// Estimates the display font size for a paragraph based on its line heights

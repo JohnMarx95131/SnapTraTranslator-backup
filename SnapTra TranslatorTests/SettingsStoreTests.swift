@@ -38,7 +38,7 @@ final class SettingsStoreMigrationTests: XCTestCase {
             DictionarySource(id: UUID(), name: "System Dictionary", type: .system, isEnabled: true),
             DictionarySource(id: UUID(), name: "Advanced Dictionary", type: .ecdict, isEnabled: true),
             DictionarySource(id: UUID(), name: "Google Translate", type: .google, isEnabled: false),
-            DictionarySource(id: UUID(), name: "Free Dictionary", type: .freeDict, isEnabled: true),
+            DictionarySource(id: UUID(), name: "Bing Dictionary", type: .bing, isEnabled: true),
         ]
         let migrated = SettingsStore.migrateDictionarySources(existing)
 

@@ -226,7 +226,8 @@ struct OverlayView: View {
     @ViewBuilder
     private func paragraphResultView(content: ParagraphOverlayContent) -> some View {
         let optimalFontSize = ParagraphFontSizing.optimalFontSize(
-            for: paragraphFontSizingSamples(from: content),
+            preferredFontSize: content.bodyFontSize,
+            originalText: content.originalText,
             containerWidth: overlayWidth,
             horizontalPadding: paragraphTextHorizontalPadding
         )
@@ -471,47 +472,6 @@ struct OverlayView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
-    }
-
-    private func paragraphFontSizingSamples(
-        from content: ParagraphOverlayContent
-    ) -> [ParagraphFontSizingSample] {
-        var samples: [ParagraphFontSizingSample] = []
-
-        if let originalText = content.originalText, !originalText.isEmpty {
-            samples.append(
-                ParagraphFontSizingSample(
-                    text: originalText,
-                    weight: .medium
-                )
-            )
-        }
-
-        if case .ready(let translatedText) = content.translationState,
-           !translatedText.isEmpty {
-            samples.append(
-                ParagraphFontSizingSample(
-                    text: translatedText,
-                    weight: .semibold
-                )
-            )
-        }
-
-        for result in content.serviceResults {
-            guard case .ready(let translatedText) = result.state,
-                  !translatedText.isEmpty else {
-                continue
-            }
-
-            samples.append(
-                ParagraphFontSizingSample(
-                    text: translatedText,
-                    weight: .medium
-                )
-            )
-        }
-
-        return samples
     }
 
     @ViewBuilder
@@ -1133,40 +1093,82 @@ struct LoadingDotsView: View {
     }
 }
 
-struct ParagraphFontSizingSample {
-    let text: String
-    let weight: NSFont.Weight
-}
-
 enum ParagraphFontSizing {
     static let minFontSize: CGFloat = 10
-    static let maxFontSize: CGFloat = 36
+    static let maxFontSize: CGFloat = 22
     static let baseFontSize: CGFloat = 13
+    static let preferredUpscaleFactor: CGFloat = 1.15
 
     static func optimalFontSize(
-        for samples: [ParagraphFontSizingSample],
+        preferredFontSize: CGFloat,
+        originalText: String?,
         containerWidth: CGFloat,
         horizontalPadding: CGFloat
     ) -> CGFloat {
-        let availableWidth = max(1, containerWidth - horizontalPadding * 2)
-        let maxLineWidth = samples
-            .compactMap { sample -> CGFloat? in
-                let trimmedText = sample.text.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !trimmedText.isEmpty else { return nil }
+        let normalizedPreferredFontSize = normalizedPreferredFontSize(preferredFontSize)
+        let targetFontSize = min(normalizedPreferredFontSize * preferredUpscaleFactor, maxFontSize)
+        guard let fittingFontSize = fittingFontSizeForOriginalText(
+            originalText,
+            targetFontSize: targetFontSize,
+            containerWidth: containerWidth,
+            horizontalPadding: horizontalPadding
+        ) else {
+            return targetFontSize
+        }
+        return min(max(fittingFontSize, 1), maxFontSize)
+    }
 
-                let font = NSFont.systemFont(ofSize: baseFontSize, weight: sample.weight)
-                let width = maximumLineWidth(for: trimmedText, font: font)
-                return width > 0 ? width : nil
-            }
-            .max()
-
-        guard let maxLineWidth else {
+    static func normalizedPreferredFontSize(_ preferredFontSize: CGFloat) -> CGFloat {
+        guard preferredFontSize.isFinite, preferredFontSize > 0 else {
             return baseFontSize
         }
+        return min(max(preferredFontSize, minFontSize), maxFontSize)
+    }
 
-        let scaleFactor = availableWidth / maxLineWidth
-        let optimalSize = baseFontSize * scaleFactor
-        return min(max(optimalSize, minFontSize), maxFontSize)
+    static func fittingFontSizeForOriginalText(
+        _ originalText: String?,
+        targetFontSize: CGFloat,
+        containerWidth: CGFloat,
+        horizontalPadding: CGFloat
+    ) -> CGFloat? {
+        guard let originalText else {
+            return nil
+        }
+
+        let trimmedText = originalText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty else {
+            return nil
+        }
+
+        let availableWidth = max(1, containerWidth - horizontalPadding * 2)
+        let targetFont = NSFont.systemFont(ofSize: targetFontSize, weight: .medium)
+        let targetLineWidth = maximumLineWidth(for: trimmedText, font: targetFont)
+        guard targetLineWidth > 0 else {
+            return targetFontSize
+        }
+
+        if targetLineWidth <= availableWidth {
+            return targetFontSize
+        }
+
+        var lowerBound: CGFloat = 1
+        var upperBound = targetFontSize
+        var bestFitFontSize = lowerBound
+
+        for _ in 0..<12 {
+            let candidateFontSize = (lowerBound + upperBound) / 2
+            let candidateFont = NSFont.systemFont(ofSize: candidateFontSize, weight: .medium)
+            let candidateWidth = maximumLineWidth(for: trimmedText, font: candidateFont)
+
+            if candidateWidth <= availableWidth {
+                bestFitFontSize = candidateFontSize
+                lowerBound = candidateFontSize
+            } else {
+                upperBound = candidateFontSize
+            }
+        }
+
+        return bestFitFontSize
     }
 
     static func maximumLineWidth(

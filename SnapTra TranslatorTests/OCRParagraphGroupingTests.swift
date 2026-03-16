@@ -62,6 +62,19 @@ final class OCRParagraphGroupingTests: XCTestCase {
         XCTAssertTrue(paragraphs.isEmpty)
     }
 
+    func testKeepsShortMultiWordHeadingWhenBuildingParagraphs() {
+        let lines = [
+            RecognizedTextLine(
+                text: "Master Plan",
+                boundingBox: CGRect(x: 0.10, y: 0.72, width: 0.18, height: 0.04)
+            ),
+        ]
+
+        let paragraphs = OCRService.groupParagraphs(from: lines)
+
+        XCTAssertEqual(paragraphs.map(\.text), ["Master Plan"])
+    }
+
     func testParsesBulletLinesIntoListItemBlocks() {
         let lines = [
             RecognizedTextLine(
