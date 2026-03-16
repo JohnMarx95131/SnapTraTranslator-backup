@@ -313,7 +313,13 @@ final class AppModel: ObservableObject {
 
     func handleHotkeyDoubleTap() {
         guard isHotkeyActive else { return }
-        guard settings.sentenceTranslationEnabled else { return }
+        guard settings.sentenceTranslationEnabled else {
+            isHotkeyActive = false
+            stopMouseTracking()
+            cancelActiveLookupWork()
+            hideOverlay()
+            return
+        }
         guard permissions.status.screenRecording else { return }
         if settings.debugShowOcrRegion {
             settings.debugShowOcrRegion = false
