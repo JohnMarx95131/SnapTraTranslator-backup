@@ -5,34 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.5-beta.2] - 2026-03-16
+## [1.3.5] - 2026-03-17
+
+### Added
+- split App Store and direct builds
 
 ### Changed
 - remove unused online dictionary services
+- point release scripts at direct scheme
 
 ### Fixed
 - improve phonetic extraction and validation
 - cleanup state when double-tap with sentence translation disabled
 - stabilize short translation overlay sizing
-
-## [1.3.5-beta.1] - 2026-03-16
-
-### Added
-- split App Store and direct builds
-
-### Changed
-- point release scripts at direct scheme
-
-### Fixed
 - share bundle id across channels
-
-## [1.3.5-beta.0] - 2026-03-16
-
-### Added
-- split App Store and direct builds
-
-### Changed
-- point release scripts at direct scheme
 
 ## [1.3.4] - 2026-03-16
 
